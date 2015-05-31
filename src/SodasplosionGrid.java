@@ -18,15 +18,6 @@ import javax.swing.JPanel;
  */
 public class SodasplosionGrid extends JPanel
 {
-	/*
-	 * |       | --------
-	 * |       |    |
-	 * |       |    |
-	 * |-------|    |
-	 * |       |    |
-	 * |       |    |
-	 * |       | --------
-	 */
 	private final int IMAGE_WIDTH, IMAGE_HEIGHT;
 
 	private Image gridImages[];
