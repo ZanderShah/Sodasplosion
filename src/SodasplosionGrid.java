@@ -98,7 +98,7 @@ public class SodasplosionGrid extends JPanel
 				if (grid[row][column] != BUILDING  
 						 &&  (row > 1 || column > 1)
 						 &&  (row < 9 || column < 11)
-						 && (int)(Math.random() * 10) <= 8)
+						 && Math.random() * 10 <= 7.5)
 					grid[row][column] = CRATE;
 			}
 		
