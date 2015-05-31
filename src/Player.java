@@ -21,7 +21,7 @@ public class Player
 	}
 
 	/**
-	 * Adds one power level to the player's given stat as long as it isn't
+	 * Adds one power level to the player's given skill as long as it isn't
 	 * capped
 	 * 
 	 * @param player the given player
