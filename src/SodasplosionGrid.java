@@ -36,6 +36,7 @@ public class SodasplosionGrid extends JPanel
 	final int CAN;
 	final int BUILDING;
 	final int CRATE;
+	final int SODASPLOSION;
 
 	/**
 	 * Constructs a new grid
@@ -59,6 +60,7 @@ public class SodasplosionGrid extends JPanel
 		gridImages[5] = new ImageIcon("Crate.png").getImage();
 		CRATE = 5;
 		border = new ImageIcon("Border.png").getImage();
+		SODASPLOSION = 6;
 
 		// Starts a new game and loads up the grid (sets size of grid array)
 		newGame();
