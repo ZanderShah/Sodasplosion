@@ -18,25 +18,16 @@ import javax.swing.JPanel;
  */
 public class SodasplosionGrid extends JPanel
 {
-	private final int IMAGE_WIDTH;
-	private final int IMAGE_HEIGHT;
+	private final int IMAGE_WIDTH, IMAGE_HEIGHT;
 
 	private Image gridImages[];
 	private Image playerImages[];
 	private Image border;
 
 	private int[][] grid;
-	private int currentRowOne;
-	private int currentColOne;
-	private int currentRowTwo = 0;
-	private int currentColTwo = 0;
+	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 	
-	final int TIRE;
-	final int MENTOS;
-	final int CAN;
-	final int BUILDING;
-	final int CRATE;
-	final int SODASPLOSION;
+	final int TIRE, MENTOS, CAN, BUILDING, CRATE, SODASPLOSION;
 
 	/**
 	 * Constructs a new grid
@@ -151,27 +142,31 @@ public class SodasplosionGrid extends JPanel
 			// past border or go through an unbreakable block
 			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
 					&& grid[currentRowOne][currentColOne - 1] != BUILDING
-					&& grid[currentRowOne][currentColOne - 1] != CRATE)
+					&& grid[currentRowOne][currentColOne - 1] != CRATE
+					&& grid[currentRowOne][currentColOne - 1] != SODASPLOSION)
 			{
 				currentColOne--;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_D
 					&& currentColOne < grid[0].length - 1
 					&& grid[currentRowOne][currentColOne + 1] != BUILDING
-					&& grid[currentRowOne][currentColOne + 1] != CRATE)
+					&& grid[currentRowOne][currentColOne + 1] != CRATE
+					&& grid[currentRowOne][currentColOne + 1] != SODASPLOSION)
 			{
 				currentColOne++;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_W && currentRowOne > 0
 					&& grid[currentRowOne - 1][currentColOne] != BUILDING
-					&& grid[currentRowOne - 1][currentColOne] != CRATE)
+					&& grid[currentRowOne - 1][currentColOne] != CRATE
+					&& grid[currentRowOne - 1][currentColOne] != SODASPLOSION)
 			{
 				currentRowOne--;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_S
 					&& currentRowOne < grid.length - 1
 					&& grid[currentRowOne + 1][currentColOne] != BUILDING
-					&& grid[currentRowOne + 1][currentColOne] != CRATE)
+					&& grid[currentRowOne + 1][currentColOne] != CRATE
+					&& grid[currentRowOne + 1][currentColOne] != SODASPLOSION)
 			{
 				currentRowOne++;
 			}
@@ -182,27 +177,31 @@ public class SodasplosionGrid extends JPanel
 			// past border or go through an unbreakable block
 			if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
 					&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
-					&& grid[currentRowTwo][currentColTwo - 1] != CRATE)
+					&& grid[currentRowTwo][currentColTwo - 1] != CRATE
+					&& grid[currentRowTwo][currentColTwo - 1] != SODASPLOSION)
 			{
 				currentColTwo--;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_RIGHT
 					&& currentColTwo < grid[0].length - 1
 					&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
-					&& grid[currentRowTwo][currentColTwo + 1] != CRATE)
+					&& grid[currentRowTwo][currentColTwo + 1] != CRATE
+					&& grid[currentRowTwo][currentColTwo + 1] != SODASPLOSION)
 			{
 				currentColTwo++;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_UP && currentRowTwo > 0
 					&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
-					&& grid[currentRowTwo - 1][currentColTwo] != CRATE)
+					&& grid[currentRowTwo - 1][currentColTwo] != CRATE
+					&& grid[currentRowTwo - 1][currentColTwo] != SODASPLOSION)
 			{
 				currentRowTwo--;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_DOWN
 					&& currentRowTwo < grid.length - 1
 					&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
-					&& grid[currentRowTwo + 1][currentColTwo] != CRATE)
+					&& grid[currentRowTwo + 1][currentColTwo] != CRATE
+					&& grid[currentRowTwo + 1][currentColTwo] != SODASPLOSION)
 			{
 				currentRowTwo++;
 			}
