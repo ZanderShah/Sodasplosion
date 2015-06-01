@@ -19,7 +19,7 @@ import javax.swing.JPanel;
  * @version May 27, 2015
  */
 public class SodasplosionGrid extends JPanel
-{
+{	
 	private final int IMAGE_WIDTH, IMAGE_HEIGHT;
 
 	private Image gridImages[];
