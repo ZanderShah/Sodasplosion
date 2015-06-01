@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Timer;
+
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +30,8 @@ public class SodasplosionGrid extends JPanel
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN;
+	
+	private Timer timer;
 
 	/**
 	 * Constructs a new grid
@@ -37,7 +41,9 @@ public class SodasplosionGrid extends JPanel
 		// Loads up the player and breakable block images
 		playerImages = new Image[2];
 		playerImages[0] = new ImageIcon("RedTruck.png").getImage();
+		Player playerOne = new Player();
 		playerImages[1] = new ImageIcon("BlueTruck.png").getImage();
+		Player playerTwo = new Player();
 		gridImages = new Image[8];
 		// Leaves gridImages[0] blank so that the default image for each tile is
 		// nothing
@@ -152,7 +158,8 @@ public class SodasplosionGrid extends JPanel
 			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
 					&& grid[currentRowOne][currentColOne - 1] != BUILDING
 					&& grid[currentRowOne][currentColOne - 1] != CRATE
-					&& grid[currentRowOne][currentColOne - 1] != REDCAN)
+					&& grid[currentRowOne][currentColOne - 1] != REDCAN
+					&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
 			{
 				currentColOne--;
 			}
@@ -160,6 +167,7 @@ public class SodasplosionGrid extends JPanel
 					&& currentColOne < grid[0].length - 1
 					&& grid[currentRowOne][currentColOne + 1] != BUILDING
 					&& grid[currentRowOne][currentColOne + 1] != CRATE
+					&& grid[currentRowOne][currentColOne + 1] != REDCAN
 					&& grid[currentRowOne][currentColOne + 1] != REDCAN)
 			{
 				currentColOne++;
@@ -167,7 +175,8 @@ public class SodasplosionGrid extends JPanel
 			else if (event.getKeyCode() == KeyEvent.VK_W && currentRowOne > 0
 					&& grid[currentRowOne - 1][currentColOne] != BUILDING
 					&& grid[currentRowOne - 1][currentColOne] != CRATE
-					&& grid[currentRowOne - 1][currentColOne] != REDCAN)
+					&& grid[currentRowOne - 1][currentColOne] != REDCAN
+					&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne--;
 			}
@@ -175,7 +184,8 @@ public class SodasplosionGrid extends JPanel
 					&& currentRowOne < grid.length - 1
 					&& grid[currentRowOne + 1][currentColOne] != BUILDING
 					&& grid[currentRowOne + 1][currentColOne] != CRATE
-					&& grid[currentRowOne + 1][currentColOne] != REDCAN)
+					&& grid[currentRowOne + 1][currentColOne] != REDCAN
+					&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne++;
 			}
@@ -183,7 +193,6 @@ public class SodasplosionGrid extends JPanel
 			else if (event.getKeyCode() == KeyEvent.VK_Q)
 			{
 				grid[currentRowOne][currentColOne] = REDCAN;
-				repaint();
 
 				if (currentRowOne != grid.length - 1
 						&& grid[currentRowOne + 1][currentColOne] != BUILDING)
@@ -214,7 +223,8 @@ public class SodasplosionGrid extends JPanel
 			if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
 					&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
 					&& grid[currentRowTwo][currentColTwo - 1] != CRATE
-					&& grid[currentRowTwo][currentColTwo - 1] != REDCAN)
+					&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
+					&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
 			{
 				currentColTwo--;
 			}
@@ -222,14 +232,16 @@ public class SodasplosionGrid extends JPanel
 					&& currentColTwo < grid[0].length - 1
 					&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
 					&& grid[currentRowTwo][currentColTwo + 1] != CRATE
-					&& grid[currentRowTwo][currentColTwo + 1] != REDCAN)
+					&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
+					&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
 			{
 				currentColTwo++;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_UP && currentRowTwo > 0
 					&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
 					&& grid[currentRowTwo - 1][currentColTwo] != CRATE
-					&& grid[currentRowTwo - 1][currentColTwo] != REDCAN)
+					&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
+					&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo--;
 			}
@@ -237,9 +249,36 @@ public class SodasplosionGrid extends JPanel
 					&& currentRowTwo < grid.length - 1
 					&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
 					&& grid[currentRowTwo + 1][currentColTwo] != CRATE
-					&& grid[currentRowTwo + 1][currentColTwo] != REDCAN)
+					&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
+					&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo++;
+			}
+			// Uncompleted collision code
+			else if (event.getKeyCode() == KeyEvent.VK_SLASH)
+			{
+				grid[currentRowTwo][currentColTwo] = BLUECAN;
+
+				if (currentRowTwo != grid.length - 1
+						&& grid[currentRowTwo + 1][currentColTwo] != BUILDING)
+				{
+					grid[currentRowTwo + 1][currentColTwo] = EMPTY;
+				}
+				if (currentRowTwo != 0
+						&& grid[currentRowTwo - 1][currentColTwo] != BUILDING)
+				{
+					grid[currentRowTwo - 1][currentColTwo] = EMPTY;
+				}
+				if (currentColTwo != grid[0].length - 1
+						&& grid[currentRowTwo][currentColTwo + 1] != BUILDING)
+				{
+					grid[currentRowTwo][currentColTwo + 1] = EMPTY;
+				}
+				if (currentColTwo != 0
+						&& grid[currentRowTwo][currentColTwo - 1] != BUILDING)
+				{
+					grid[currentRowTwo][currentColTwo - 1] = EMPTY;
+				}
 			}
 
 			// Repaint the screen after the change
