@@ -7,7 +7,7 @@ import javax.swing.*;
 /**
  * Main program for Sodasplosion
  *
- * @author Alexander Shah
+ * @author Alexander Shah and Amy Zhang
  * @version May 27, 2015
  */
 public class SodasplosionMain extends JFrame

@@ -1,5 +1,11 @@
 import java.awt.Color;
 
+/**
+ * Creates a player object
+ *
+ * @author Alexander Shah
+ * @version Jun 1, 2015
+ */
 public class Player
 {
 	private int[] powerUps;
@@ -46,5 +52,26 @@ public class Player
 	public int checkRange(Player player)
 	{
 		return powerUps[2];
+	}
+	
+	/**
+	 * Checks if the player has enough current cans to place a can
+	 */
+	public boolean canPlaceCan()
+	{
+		if (currentCans > 0)
+		{
+			currentCans--;
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns a can to the player after the sodasplosion is done
+	 */
+	public void returnCan()
+	{
+		currentCans++;
 	}
 }
