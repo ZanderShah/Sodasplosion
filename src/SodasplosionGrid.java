@@ -26,7 +26,7 @@ public class SodasplosionGrid extends JPanel
 
 	private int[][] grid;
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
-	
+
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN;
 
 	/**
@@ -39,7 +39,8 @@ public class SodasplosionGrid extends JPanel
 		playerImages[0] = new ImageIcon("RedTruck.png").getImage();
 		playerImages[1] = new ImageIcon("BlueTruck.png").getImage();
 		gridImages = new Image[8];
-		// Leaves gridImages[0] blank so that the default image for each tile is nothing
+		// Leaves gridImages[0] blank so that the default image for each tile is
+		// nothing
 		EMPTY = 0;
 		gridImages[1] = new ImageIcon("Tire.png").getImage();
 		TIRE = 1;
@@ -73,6 +74,9 @@ public class SodasplosionGrid extends JPanel
 		this.requestFocusInWindow();
 	}
 
+	/**
+	 * Resets the grid to prepare for a new game
+	 */
 	public void newGame()
 	{
 		// Initial position of the player
@@ -88,27 +92,28 @@ public class SodasplosionGrid extends JPanel
 		grid = new int[noOfRows][noOfColumns];
 
 		// Adds the buildings to the grid
-		for (int row = 1; row < grid.length; row ++)
-			for (int column = 1; column < grid[0].length; column ++)
+		for (int row = 1; row < grid.length; row++)
+			for (int column = 1; column < grid[0].length; column++)
 			{
 				if (row % 2 != 0 && column % 2 != 0)
 					grid[row][column] = BUILDING;
 			}
-		
+
 		// Adds the crates to the grid
 		for (int row = 0; row < grid.length; row++)
 			for (int column = 0; column < grid[0].length; column++)
 			{
-				if (grid[row][column] != BUILDING  
-						 &&  (row > 1 || column > 1)
-						 &&  (row < 9 || column < 11)
-						 && Math.random() * 10 <= 7.5)
+				if (grid[row][column] != BUILDING
+						&& (row > 1 || column > 1)
+						&& (row < 9 || column < 11)
+						&& Math.random() * 10 <= 7.5)
 					grid[row][column] = CRATE;
 			}
 	}
 
 	/**
 	 * Repaint the drawing panel
+	 * 
 	 * @param g The Graphics context
 	 */
 	public void paintComponent(Graphics g)
@@ -174,11 +179,12 @@ public class SodasplosionGrid extends JPanel
 			{
 				currentRowOne++;
 			}
+			// Uncompleted collision code
 			else if (event.getKeyCode() == KeyEvent.VK_Q)
 			{
 				grid[currentRowOne][currentColOne] = REDCAN;
 				repaint();
-				
+
 				if (currentRowOne != grid.length - 1
 						&& grid[currentRowOne + 1][currentColOne] != BUILDING)
 				{
