@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Timer;
-
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,8 +29,6 @@ public class SodasplosionGrid extends JPanel
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN;
-	
-	private Timer timer;
 
 	/**
 	 * Constructs a new grid
@@ -45,6 +42,7 @@ public class SodasplosionGrid extends JPanel
 		playerImages[1] = new ImageIcon("BlueTruck.png").getImage();
 		Player playerTwo = new Player();
 		gridImages = new Image[8];
+
 		// Leaves gridImages[0] blank so that the default image for each tile is
 		// nothing
 		EMPTY = 0;
