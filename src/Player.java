@@ -44,14 +44,36 @@ public class Player
 	}
 	
 	/**
+	 * Returns the given player's speed
+	 * 
+	 * @param player the given player
+	 * @return the speed of the given player
+	 */
+	public int getSpeed(Player player)
+	{
+		return powerUps[1];
+	}
+	
+	/**
 	 * Returns the given player's sodasplosion range
 	 * 
 	 * @param player the given player
 	 * @return the sodasplosion range of the given player
 	 */
-	public int checkRange(Player player)
+	public int getRange(Player player)
 	{
 		return powerUps[2];
+	}
+	
+	/**
+	 * Returns the given player's total number of cans
+	 * 
+	 * @param player the given player
+	 * @return the total number of cans of the given player
+	 */
+	public int getTotalCans(Player player)
+	{
+		return powerUps[3];
 	}
 	
 	/**
