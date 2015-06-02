@@ -36,7 +36,7 @@ public class SodasplosionGrid extends JPanel
 	
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN, EXPLOSION;
 
-	Timer sodasplosion;
+	Timer explosion;
 
 	/**
 	 * Constructs a new grid
@@ -137,6 +137,7 @@ public class SodasplosionGrid extends JPanel
 						&& Math.random() * 10 <= 7.5)
 				{
 					grid[row][column] = CRATE;
+					// HELLO AMY
 				}
 			}
 		}
@@ -164,10 +165,11 @@ public class SodasplosionGrid extends JPanel
 				playerTwoCanCol[currentCanPos] = canCol;
 			}	
 			
-			System.out.println(playerOneCanRow[currentCanPos]);
-			System.out.println(playerOneCanCol[currentCanPos]);
-			System.out.println(playerTwoCanRow[currentCanPos]);
-			System.out.println(playerTwoCanCol[currentCanPos]);
+			explosion = new Timer(3000, new TimerEventHandler ());
+			explosion.start();
+			
+			System.out.println(explosion);
+			
 		}
 	}
 
