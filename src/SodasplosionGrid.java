@@ -27,7 +27,10 @@ public class SodasplosionGrid extends JPanel
 	int[] playerTwoCanRow, playerTwoCanCol;
 	
 	private Image border;
-
+	
+	int playerOnePos = 0;
+	int playerTwoPos = 4;
+	
 	private int[][] grid;
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 	
@@ -42,8 +45,14 @@ public class SodasplosionGrid extends JPanel
 	{
 		// Loads up the player and breakable block images
 		playerImages = new Image[8];
-		playerImages[0] = new ImageIcon("RedTruck.png").getImage();
-		playerImages[4] = new ImageIcon("BlueTruck.png").getImage();
+
+		for (int imageNo = 0; imageNo < 4; imageNo++)
+			playerImages[imageNo] = new ImageIcon("RedTruck"+imageNo+".png").getImage();
+		for (int imageNo = 4; imageNo < 8; imageNo++)
+			playerImages[imageNo] = new ImageIcon("BlueTruck"+imageNo+".png").getImage();
+		
+		gridImages = new Image[8];
+
 		playerOneCanRow = new int[5];
 		playerOneCanCol = new int[5];
 		playerTwoCanRow = new int[5];
@@ -184,11 +193,12 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		// Draw the moving player on top of the grid
-		g.drawImage(playerImages[0],
+		g.drawImage(playerImages[playerOnePos],
 				currentColOne * IMAGE_WIDTH + 160,
 				currentRowOne * IMAGE_HEIGHT + 32, this);
 
-		g.drawImage(playerImages[4],
+
+		g.drawImage(playerImages[playerTwoPos],
 				currentColTwo * IMAGE_WIDTH + 160,
 				currentRowTwo * IMAGE_HEIGHT + 32, this);
 	}
@@ -227,6 +237,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
 			{
 				currentColOne--;
+				playerOnePos = 0;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_D
 					&& currentColOne < grid[0].length - 1
@@ -236,6 +247,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne][currentColOne + 1] != BLUECAN)
 			{
 				currentColOne++;
+				playerOnePos = 2;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_W && currentRowOne > 0
 					&& grid[currentRowOne - 1][currentColOne] != BUILDING
@@ -244,6 +256,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne--;
+				playerOnePos = 1;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_S
 					&& currentRowOne < grid.length - 1
@@ -253,6 +266,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne++;
+				playerOnePos = 3;
 			}
 			// Places a can
 			else if (event.getKeyCode() == KeyEvent.VK_Q
@@ -273,6 +287,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
 			{
 				currentColTwo--;
+				playerTwoPos = 4;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_RIGHT
 					&& currentColTwo < grid[0].length - 1
@@ -282,6 +297,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
 			{
 				currentColTwo++;
+				playerTwoPos = 6;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_UP && currentRowTwo > 0
 					&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
@@ -290,6 +306,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo--;
+				playerTwoPos = 5;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_DOWN
 					&& currentRowTwo < grid.length - 1
@@ -299,6 +316,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo++;
+				playerTwoPos = 7;
 			}
 			// Places a can
 			else if (event.getKeyCode() == KeyEvent.VK_SLASH
