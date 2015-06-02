@@ -5,12 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Timer;
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 /**
@@ -25,15 +19,18 @@ public class SodasplosionGrid extends JPanel
 
 	private Image gridImages[];
 	private Image playerImages[];
+	
 	Player playerOne = new Player();
+	int[] playerOneCanRow, playerOneCanCol;
+	
 	Player playerTwo = new Player();
+	int[] playerTwoCanRow, playerTwoCanCol;
+	
 	private Image border;
 
 	private int[][] grid;
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 	
-	private boolean isKeyPressed [] = new boolean [10];
-
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN, EXPLOSION;
 
 	Timer sodasplosion;
@@ -47,6 +44,10 @@ public class SodasplosionGrid extends JPanel
 		playerImages = new Image[8];
 		playerImages[0] = new ImageIcon("RedTruck.png").getImage();
 		playerImages[4] = new ImageIcon("BlueTruck.png").getImage();
+		playerOneCanRow = new int[5];
+		playerOneCanCol = new int[5];
+		playerTwoCanRow = new int[5];
+		playerTwoCanCol = new int[5];
 
 		gridImages = new Image[9];
 
@@ -134,19 +135,30 @@ public class SodasplosionGrid extends JPanel
 
 	public void placeCan(Player player, int canRow, int canCol)
 	{
-		if (player.canPlaceCan())
+		if (player.getCurrentCans() > 0)
 		{
+			player.placeCan();
+			int currentCanPos = player.getCurrentCans();
+
 			if (player == playerOne)
 			{
 				grid[canRow][canCol] = REDCAN;
+				
+				playerOneCanRow[currentCanPos] = canRow;
+				playerOneCanCol[currentCanPos] = canCol;
 			}
 			else
 			{
 				grid[canRow][canCol] = BLUECAN;
-			}
-
-			//sodasplosion = new Timer(100, new TimerEventHandler());
-			//sodasplosion.start();
+				
+				playerTwoCanRow[currentCanPos] = canRow;
+				playerTwoCanCol[currentCanPos] = canCol;
+			}	
+			
+			System.out.println(playerOneCanRow[currentCanPos]);
+			System.out.println(playerOneCanCol[currentCanPos]);
+			System.out.println(playerTwoCanRow[currentCanPos]);
+			System.out.println(playerTwoCanCol[currentCanPos]);
 		}
 	}
 
@@ -176,7 +188,7 @@ public class SodasplosionGrid extends JPanel
 				currentColOne * IMAGE_WIDTH + 160,
 				currentRowOne * IMAGE_HEIGHT + 32, this);
 
-		g.drawImage(playerImages[1],
+		g.drawImage(playerImages[4],
 				currentColTwo * IMAGE_WIDTH + 160,
 				currentRowTwo * IMAGE_HEIGHT + 32, this);
 	}
@@ -187,7 +199,7 @@ public class SodasplosionGrid extends JPanel
 	private class TimerEventHandler implements ActionListener
 	{
 		/**
-		 * Creates a sodasplosion
+		 * Acts whenever the timer fires
 		 * 
 		 * @param event the Timer event
 		 */
