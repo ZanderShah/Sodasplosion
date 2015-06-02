@@ -9,7 +9,8 @@ import java.awt.Color;
 public class Player
 {
 	private int[] powerUps;
-	private int currentCans = 1;
+	private int currentCans;
+	
 
 	/**
 	 * Constructs a player object, starting all power ups at 1
@@ -45,52 +46,47 @@ public class Player
 	
 	/**
 	 * Returns the given player's speed
-	 * 
-	 * @param player the given player
-	 * @return the speed of the given player
 	 */
-	public int getSpeed(Player player)
+	public int getSpeed()
 	{
 		return powerUps[1];
 	}
 	
 	/**
 	 * Returns the given player's sodasplosion range
-	 * 
-	 * @param player the given player
-	 * @return the sodasplosion range of the given player
 	 */
-	public int getRange(Player player)
+	public int getRange()
 	{
 		return powerUps[2];
 	}
 	
 	/**
 	 * Returns the given player's total number of cans
-	 * 
-	 * @param player the given player
-	 * @return the total number of cans of the given player
 	 */
-	public int getTotalCans(Player player)
+	public int getTotalCans()
 	{
 		return powerUps[3];
 	}
 	
 	/**
-	 * Checks if the player has enough current cans to place a can
+	 * Returns the given player's current cans
 	 */
-	public boolean canPlaceCan()
+	public int getCurrentCans()
 	{
-		if (currentCans > 0)
-		{
-			currentCans--;
-			return true;
-		}
-		return false;
+		return currentCans;
 	}
 	
 	/**
-	 * Returns a can to the player after the sodasplosion is done
+	 * Removes a can from the given player
+	 */
+	public void placeCan()
+	{
+		currentCans--;
+	}
+
+	
+	/**
+	 * Returns a can to the given player
 	 */
 	public void returnCan()
 	{
