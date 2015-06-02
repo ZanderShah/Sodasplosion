@@ -33,6 +33,7 @@ public class SodasplosionGrid extends JPanel
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
 	
 	private boolean isKeyPressed [] = new boolean [10];
+	private Timer timer;
 
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN;
 
@@ -206,7 +207,7 @@ public class SodasplosionGrid extends JPanel
 			// based on the key pressed
 			// If the player is trying to move, make sure player cannot move
 			// past border or go through an unbreakable block
-			
+			System.out.println(event);
 			
 			
 			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
