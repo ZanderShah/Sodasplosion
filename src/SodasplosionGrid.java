@@ -34,7 +34,7 @@ public class SodasplosionGrid extends JPanel
 	
 	private boolean isKeyPressed [] = new boolean [10];
 
-	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN;
+	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN, EXPLOSION;
 
 	Timer sodasplosion;
 
@@ -44,11 +44,11 @@ public class SodasplosionGrid extends JPanel
 	public SodasplosionGrid()
 	{
 		// Loads up the player and breakable block images
-		playerImages = new Image[2];
+		playerImages = new Image[8];
 		playerImages[0] = new ImageIcon("RedTruck.png").getImage();
-		playerImages[1] = new ImageIcon("BlueTruck.png").getImage();
+		playerImages[4] = new ImageIcon("BlueTruck.png").getImage();
 
-		gridImages = new Image[8];
+		gridImages = new Image[9];
 
 		// Leaves gridImages[0] blank so that the default image for each tile is
 		// nothing
@@ -67,6 +67,8 @@ public class SodasplosionGrid extends JPanel
 		REDCAN = 6;
 		gridImages[7] = new ImageIcon("BlueCan.png").getImage();
 		BLUECAN = 7;
+		gridImages[8] = new ImageIcon("Explosion.png").getImage();
+		EXPLOSION = 8;
 		border = new ImageIcon("Border.png").getImage();
 
 		// Starts a new game and loads up the grid (sets size of grid array)
@@ -184,7 +186,6 @@ public class SodasplosionGrid extends JPanel
 	 */
 	private class TimerEventHandler implements ActionListener
 	{
-
 		/**
 		 * Creates a sodasplosion
 		 * 
@@ -206,8 +207,6 @@ public class SodasplosionGrid extends JPanel
 			// based on the key pressed
 			// If the player is trying to move, make sure player cannot move
 			// past border or go through an unbreakable block
-			
-			
 			
 			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
 					&& grid[currentRowOne][currentColOne - 1] != BUILDING
