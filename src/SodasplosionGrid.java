@@ -7,6 +7,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
+
 /**
  * The grid for Sodasplosion
  *
@@ -36,13 +37,17 @@ public class SodasplosionGrid extends JPanel
 	
 	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN, EXPLOSION;
 
-	Timer explosion;
+	Timer[] explosion;
 
 	/**
 	 * Constructs a new grid
 	 */
 	public SodasplosionGrid()
 	{
+		explosion = new Timer[8];
+		for (int timer = 0; timer < explosion.length; timer++)
+			explosion[timer] = new Timer(3000, new TimerEventHandler ());
+		
 		// Loads up the player and breakable block images
 		playerImages = new Image[8];
 
@@ -137,7 +142,6 @@ public class SodasplosionGrid extends JPanel
 						&& Math.random() * 10 <= 7.5)
 				{
 					grid[row][column] = CRATE;
-					// HELLO AMY
 				}
 			}
 		}
@@ -156,6 +160,7 @@ public class SodasplosionGrid extends JPanel
 				
 				playerOneCanRow[currentCanPos] = canRow;
 				playerOneCanCol[currentCanPos] = canCol;
+				explosion[currentCanPos].start();
 			}
 			else
 			{
@@ -163,13 +168,8 @@ public class SodasplosionGrid extends JPanel
 				
 				playerTwoCanRow[currentCanPos] = canRow;
 				playerTwoCanCol[currentCanPos] = canCol;
-			}	
-			
-			explosion = new Timer(3000, new TimerEventHandler ());
-			explosion.start();
-			
-			System.out.println(explosion);
-			
+				explosion[currentCanPos + 4].start();
+			}		
 		}
 	}
 
