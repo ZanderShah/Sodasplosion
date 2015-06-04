@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
+import javax.swing.Timer;
+import java.awt.event.*;
 
 
 /**
@@ -21,11 +23,8 @@ public class SodasplosionGrid extends JPanel
 	private Image gridImages[];
 	private Image playerImages[];
 	
-	Player playerOne = new Player();
-	int[] playerOneCanRow, playerOneCanCol;
-	
+	Player playerOne = new Player();	
 	Player playerTwo = new Player();
-	int[] playerTwoCanRow, playerTwoCanCol;
 	
 	private Image border;
 	
@@ -44,9 +43,7 @@ public class SodasplosionGrid extends JPanel
 	 */
 	public SodasplosionGrid()
 	{
-		explosion = new Timer[8];
-		for (int timer = 0; timer < explosion.length; timer++)
-			explosion[timer] = new Timer(3000, new TimerEventHandler ());
+		explosion = new Timer[10];
 		
 		// Loads up the player and breakable block images
 		playerImages = new Image[8];
@@ -56,13 +53,6 @@ public class SodasplosionGrid extends JPanel
 		for (int imageNo = 4; imageNo < 8; imageNo++)
 			playerImages[imageNo] = new ImageIcon("BlueTruck"+imageNo+".png").getImage();
 		
-		gridImages = new Image[8];
-
-		playerOneCanRow = new int[5];
-		playerOneCanCol = new int[5];
-		playerTwoCanRow = new int[5];
-		playerTwoCanCol = new int[5];
-
 		gridImages = new Image[9];
 
 		// Leaves gridImages[0] blank so that the default image for each tile is
@@ -153,26 +143,71 @@ public class SodasplosionGrid extends JPanel
 		{
 			player.placeCan();
 			int currentCanPos = player.getCurrentCans();
-
+			
 			if (player == playerOne)
 			{
 				grid[canRow][canCol] = REDCAN;
-				
-				playerOneCanRow[currentCanPos] = canRow;
-				playerOneCanCol[currentCanPos] = canCol;
+				explosion[currentCanPos] = new Timer(3000, 
+						new TimerEventHandler (player, canRow, canCol, currentCanPos));
 				explosion[currentCanPos].start();
 			}
 			else
 			{
 				grid[canRow][canCol] = BLUECAN;
-				
-				playerTwoCanRow[currentCanPos] = canRow;
-				playerTwoCanCol[currentCanPos] = canCol;
-				explosion[currentCanPos + 4].start();
+				explosion[currentCanPos + 5] = new Timer(3000, 
+						new TimerEventHandler (player, canRow, canCol, currentCanPos + 5));
+				explosion[currentCanPos + 5].start();
 			}		
 		}
 	}
 
+	/**
+	 * An inner class to deal with the timer events
+	 */
+	private class TimerEventHandler implements ActionListener
+	{
+		int canRow, canCol, range, whichExplosion;
+		Player player;
+		
+		public TimerEventHandler(Player player, int canRow, int canCol, int whichExplosion)
+		{
+			this.player = player;
+			this.canRow = canRow;
+			this.canCol = canCol;
+			this.range = player.getRange();
+			this.whichExplosion = whichExplosion;
+		}
+		
+		public void actionPerformed(ActionEvent event)
+		{
+			grid[canRow][canCol] = EMPTY;
+
+			for (int radius = 1; radius <= range; radius++)
+			{
+				if (canRow + radius < grid.length && grid[canRow + radius][canCol] != BUILDING)
+				{
+					grid[canRow + radius][canCol] = EMPTY;
+				}
+				if (canRow - radius >= 0 && grid[canRow - radius][canCol] != BUILDING)
+				{
+					grid[canRow - radius][canCol] = EMPTY;
+				}
+				if (canCol + radius < grid[0].length && grid[canRow][canCol + radius] != BUILDING)
+				{
+					grid[canRow][canCol + radius] = EMPTY;
+				}
+				if (canCol - radius >= 0 && grid[canRow][canCol - radius] != BUILDING)
+				{
+					grid[canRow][canCol - radius] = EMPTY;
+				}
+			}
+			
+			repaint();
+			explosion[whichExplosion].stop();
+			player.returnCan();
+		}
+	}
+	
 	/**
 	 * Repaint the drawing panel
 	 * 
@@ -203,23 +238,6 @@ public class SodasplosionGrid extends JPanel
 		g.drawImage(playerImages[playerTwoPos],
 				currentColTwo * IMAGE_WIDTH + 160,
 				currentRowTwo * IMAGE_HEIGHT + 32, this);
-	}
-
-	/**
-	 * An inner class to deal with the timer events
-	 */
-	private class TimerEventHandler implements ActionListener
-	{
-		/**
-		 * Acts whenever the timer fires
-		 * 
-		 * @param event the Timer event
-		 */
-		public void actionPerformed(ActionEvent event)
-		{
-			// Repaint the screen
-			repaint();
-		}
 	}
 
 	// Inner class to handle key events
@@ -271,9 +289,7 @@ public class SodasplosionGrid extends JPanel
 				playerOnePos = 3;
 			}
 			// Places a can
-			else if (event.getKeyCode() == KeyEvent.VK_Q
-					&& currentRowOne != currentRowTwo
-					&& currentColOne != currentColTwo)
+			else if (event.getKeyCode() == KeyEvent.VK_Q)
 			{
 				placeCan(playerOne, currentRowOne, currentColOne);
 			}

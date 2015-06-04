@@ -31,15 +31,14 @@ public class Player
 	 * Adds one power level to the player's given skill as long as it isn't
 	 * capped
 	 * 
-	 * @param player the given player
 	 * @param type the given item type
 	 */
-	public void addPower(Player player, int type)
+	public void addPower(int type)
 	{
-		if (powerUps[type] < 5)
+		if (powerUps[type] <= 5)
 		{
 			powerUps[type]++;
-			if (type == 2)
+			if (type == 3)
 				currentCans++;
 		}
 	}
