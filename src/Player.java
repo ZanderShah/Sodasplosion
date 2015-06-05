@@ -35,7 +35,7 @@ public class Player
 	 */
 	public void addPower(int type)
 	{
-		if (powerUps[type] <= 5)
+		if (powerUps[type] < 5)
 		{
 			powerUps[type]++;
 			if (type == 3)
