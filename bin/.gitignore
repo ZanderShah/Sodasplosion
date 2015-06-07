@@ -5,3 +5,9 @@
 /Menu.class
 /HelpDemoMain.class
 /SodasplosionGrid$TimerEventHandler.class
+/MainMenu$MouseHandler.class
+/MainMenu.class
+/SodasplosionGrid1$KeyHandler.class
+/SodasplosionGrid1$MouseHandler.class
+/SodasplosionGrid1$TimerEventHandler.class
+/SodasplosionGrid1.class
