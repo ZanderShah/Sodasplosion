@@ -83,7 +83,6 @@ public class Player
 		currentCans--;
 	}
 
-	
 	/**
 	 * Returns a can to the given player
 	 */
