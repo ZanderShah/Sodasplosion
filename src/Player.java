@@ -90,4 +90,9 @@ public class Player
 	{
 		currentCans++;
 	}
+	
+	public String toString()
+	{
+		return "Player One:";
+	}
 }

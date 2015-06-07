@@ -66,12 +66,12 @@ public class SodasplosionGrid extends JPanel
 		// Sets up the timers for each explosion
 		for (int timer = 0; timer < explosion.length / 2; timer++)
 		{
-			explosion[timer] = new Timer(1000, new TimerEventHandler(playerOne,
+			explosion[timer] = new Timer(3000, new TimerEventHandler(playerOne,
 					timer));
 		}
 		for (int timer = explosion.length / 2; timer < explosion.length; timer++)
 		{
-			explosion[timer] = new Timer(1000, new TimerEventHandler(playerTwo,
+			explosion[timer] = new Timer(3000, new TimerEventHandler(playerTwo,
 					timer));
 		}
 
@@ -96,7 +96,6 @@ public class SodasplosionGrid extends JPanel
 		BLUECAN = 7;
 		gridImages[8] = new ImageIcon("Explosion.png").getImage();
 		EXPLOSION = 8;
-		border = new ImageIcon("Border.png").getImage();
 
 		// Starts a new game and loads up the grid (sets size of grid array)
 		newGame();
@@ -105,13 +104,16 @@ public class SodasplosionGrid extends JPanel
 		// Also sizes this panel based on the image and grid size
 		IMAGE_WIDTH = 64;
 		IMAGE_HEIGHT = 64;
-		Dimension size = new Dimension(1024, 768);
+		Dimension size = new Dimension(960, 704);
 		this.setPreferredSize(size);
 
 		// Sets up for keyboard input (arrow keys) on this panel
 		this.setFocusable(true);
 		this.addKeyListener(new KeyHandler());
 		this.requestFocusInWindow();
+		
+		for (int i = 1; i <= 4; i++)
+			playerOne.addPower(3);
 	}
 
 	/**
@@ -145,7 +147,7 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		// Adds the crates to the grid
-		for (int row = 0; row < grid.length; row++)
+		/*for (int row = 0; row < grid.length; row++)
 		{
 			for (int column = 0; column < grid[0].length; column++)
 			{
@@ -157,13 +159,14 @@ public class SodasplosionGrid extends JPanel
 					grid[row][column] = CRATE;
 				}
 			}
-		}
+		}*/
 	}
 
 	public void placeCan(Player player, int canRow, int canCol)
 	{
 		if (player.getCurrentCans() > 0)
 		{
+			System.out.println(player.getCurrentCans());
 			player.placeCan();
 
 			int currentCanPos = player.getCurrentCans();
@@ -264,6 +267,11 @@ public class SodasplosionGrid extends JPanel
 
 					alreadyHitSomething = true;
 				}
+				else if (grid[currentCanRow + downPos][currentCanCol] == REDCAN
+					|| grid[currentCanRow + downPos][currentCanCol] == BLUECAN)
+				{
+					explosion[whichExplosion + 1].setDelay(0);;
+				}
 			}
 			
 			alreadyHitSomething = false; 
@@ -337,19 +345,19 @@ public class SodasplosionGrid extends JPanel
 			for (int column = 0; column < grid[0].length; column++)
 			{
 				g.drawImage(gridImages[grid[row][column]], column * IMAGE_WIDTH
-						+ 160,
-						row * IMAGE_HEIGHT + 32, this);
+						+ 128,
+						row * IMAGE_HEIGHT, this);
 			}
 		}
 
 		// Draw the moving player on top of the grid
 		g.drawImage(playerImages[playerOnePos],
-				currentColOne * IMAGE_WIDTH + 160,
-				currentRowOne * IMAGE_HEIGHT + 32, this);
+				currentColOne * IMAGE_WIDTH + 128,
+				currentRowOne * IMAGE_HEIGHT, this);
 
 		g.drawImage(playerImages[playerTwoPos],
-				currentColTwo * IMAGE_WIDTH + 160,
-				currentRowTwo * IMAGE_HEIGHT + 32, this);
+				currentColTwo * IMAGE_WIDTH + 128,
+				currentRowTwo * IMAGE_HEIGHT, this);
 	}
 
 	// Inner class to handle key events
