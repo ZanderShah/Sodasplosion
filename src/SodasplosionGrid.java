@@ -353,7 +353,7 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	// Inner class to handle key events
-	private class KeyHandler extends KeyAdapter
+		private class KeyHandler extends KeyAdapter
 	{
 		public void keyPressed(KeyEvent event)
 		{
