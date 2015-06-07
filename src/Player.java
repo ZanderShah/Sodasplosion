@@ -24,7 +24,7 @@ public class Player
 		powerUps[1] = 1;
 		powerUps[2] = 1;
 		powerUps[3] = 1;
-		this.currentCans = 1;
+		currentCans = 1;
 	}
 
 	/**

@@ -66,12 +66,12 @@ public class SodasplosionGrid extends JPanel
 		// Sets up the timers for each explosion
 		for (int timer = 0; timer < explosion.length / 2; timer++)
 		{
-			explosion[timer] = new Timer(500, new TimerEventHandler(playerOne,
+			explosion[timer] = new Timer(1000, new TimerEventHandler(playerOne,
 					timer));
 		}
 		for (int timer = explosion.length / 2; timer < explosion.length; timer++)
 		{
-			explosion[timer] = new Timer(500, new TimerEventHandler(playerTwo,
+			explosion[timer] = new Timer(1000, new TimerEventHandler(playerTwo,
 					timer));
 		}
 
@@ -184,7 +184,6 @@ public class SodasplosionGrid extends JPanel
 				canCols[currentCanPos + 5] = canCol;
 				explosion[currentCanPos + 5].start();
 			}
-			System.out.println(currentCanPos);
 		}
 	}
 
@@ -193,8 +192,7 @@ public class SodasplosionGrid extends JPanel
 	 */
 	private class TimerEventHandler implements ActionListener
 	{
-		int currentCanRow, currentCanCol, range, whichExplosion;
-		int[] timer = new int[10];
+		int whichExplosion;
 		Player player;
 
 		/**
@@ -207,7 +205,6 @@ public class SodasplosionGrid extends JPanel
 		{
 			this.player = player;
 			this.whichExplosion = whichExplosion;
-			timer[whichExplosion] = 0;
 		}
 
 		/**
@@ -215,16 +212,19 @@ public class SodasplosionGrid extends JPanel
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
-			range = player.getRange();
-			currentCanRow = canRows[whichExplosion];
-			currentCanCol = canCols[whichExplosion];
+			int range = player.getRange();
+			int currentCanRow = canRows[whichExplosion];
+			int currentCanCol = canCols[whichExplosion];
 
 			grid[currentCanRow][currentCanCol] = EMPTY;
-
+			
+			boolean alreadyHitSomething = false;
+			
 			// Collision code for the upwards direction
 			for (int upPos = 1; upPos <= range
 					&& currentCanRow - upPos >= 0
-					&& grid[currentCanRow - upPos][currentCanCol] != BUILDING; upPos++)
+					&& grid[currentCanRow - upPos][currentCanCol] != BUILDING
+					&& !alreadyHitSomething; upPos++)
 			{
 				if (grid[currentCanRow - upPos][currentCanCol] == CRATE)
 				{
@@ -237,17 +237,18 @@ public class SodasplosionGrid extends JPanel
 					{
 						grid[currentCanRow - upPos][currentCanCol] = EMPTY;
 					}
-				}
-				else
-				{
-					grid[currentCanRow - upPos][currentCanCol] = EMPTY;
+					
+					alreadyHitSomething = true;
 				}
 			}
-
+			
+			alreadyHitSomething = false; 
+			
 			// Collision code for the downwards direction
 			for (int downPos = 1; downPos <= range
 					&& currentCanRow + downPos < grid.length
-					&& grid[currentCanRow + downPos][currentCanCol] != BUILDING; downPos++)
+					&& grid[currentCanRow + downPos][currentCanCol] != BUILDING
+					&& !alreadyHitSomething; downPos++)
 			{
 				if (grid[currentCanRow + downPos][currentCanCol] == CRATE)
 				{
@@ -260,17 +261,18 @@ public class SodasplosionGrid extends JPanel
 					{
 						grid[currentCanRow + downPos][currentCanCol] = EMPTY;
 					}
-				}
-				else
-				{
-					grid[currentCanRow + downPos][currentCanCol] = EMPTY;
+
+					alreadyHitSomething = true;
 				}
 			}
-
+			
+			alreadyHitSomething = false; 
+			
 			// Collision code for the left direction
 			for (int leftPos = 1; leftPos <= range
 					&& currentCanCol - leftPos >= 0
-					&& grid[currentCanRow][currentCanCol - leftPos] != BUILDING; leftPos++)
+					&& grid[currentCanRow][currentCanCol - leftPos] != BUILDING
+					&& !alreadyHitSomething; leftPos++)
 			{
 				if (grid[currentCanRow][currentCanCol - leftPos] == CRATE)
 				{
@@ -283,17 +285,18 @@ public class SodasplosionGrid extends JPanel
 					{
 						grid[currentCanRow][currentCanCol - leftPos] = EMPTY;
 					}
-				}
-				else
-				{
-					grid[currentCanRow][currentCanCol - leftPos] = EMPTY;
+
+					alreadyHitSomething = true;
 				}
 			}
 
+			alreadyHitSomething = false; 
+			
 			// Collision code for the right direction
 			for (int rightPos = 1; rightPos <= range
 					&& currentCanCol + rightPos < grid[0].length
-					&& grid[currentCanRow][currentCanCol + rightPos] != BUILDING; rightPos++)
+					&& grid[currentCanRow][currentCanCol + rightPos] != BUILDING
+					&& !alreadyHitSomething; rightPos++)
 			{
 				if (grid[currentCanRow][currentCanCol + rightPos] == CRATE)
 				{
@@ -306,17 +309,14 @@ public class SodasplosionGrid extends JPanel
 					{
 						grid[currentCanRow][currentCanCol + rightPos] = EMPTY;
 					}
-				}
-				else
-				{
-					grid[currentCanRow][currentCanCol + rightPos] = EMPTY;
+
+					alreadyHitSomething = true;
 				}
 			}
 
 			// Resets the timer and returns the can to the given player
-			timer[whichExplosion] = 0;
-			explosion[whichExplosion].stop();
 			player.returnCan();
+			explosion[whichExplosion].stop();
 			repaint();
 		}
 	}
