@@ -10,6 +10,7 @@ public class Player
 {
 	private int[] powerUps;
 	private int currentCans;
+	private int noOfLives;
 	
 
 	/**
@@ -17,11 +18,11 @@ public class Player
 	 */
 	public Player()
 	{
-		// 1 is speed
+		// 1 is number of lives
 		// 2 is strength
 		// 3 is total cans
 		powerUps = new int[4];
-		powerUps[1] = 1;
+		powerUps[1] = 3;
 		powerUps[2] = 1;
 		powerUps[3] = 1;
 		currentCans = 1;
@@ -35,7 +36,7 @@ public class Player
 	 */
 	public void addPower(int type)
 	{
-		if (powerUps[type] < 5)
+		if (powerUps[type] < 5 && (type != 1 && powerUps[type] < 3))
 		{
 			powerUps[type]++;
 			if (type == 3)
@@ -46,7 +47,7 @@ public class Player
 	/**
 	 * Returns the given player's speed
 	 */
-	public int getSpeed()
+	public int getNoOfLives()
 	{
 		return powerUps[1];
 	}
@@ -94,5 +95,10 @@ public class Player
 	public String toString()
 	{
 		return "Player One:";
+	}
+	
+	public void loseLife()
+	{
+		powerUps[1]--;
 	}
 }
