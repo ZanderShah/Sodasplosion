@@ -81,12 +81,12 @@ public class SodasplosionGrid extends JPanel
 		playerImages = new Image[8];
 		for (int imageNo = 0; imageNo < 4; imageNo++)
 		{
-			playerImages[imageNo] = new ImageIcon("RedTruck" + imageNo + ".png")
+			playerImages[imageNo] = new ImageIcon("img/RedTruck" + imageNo + ".png")
 					.getImage();
 		}
 		for (int imageNo = 4; imageNo < 8; imageNo++)
 		{
-			playerImages[imageNo] = new ImageIcon("BlueTruck" + imageNo
+			playerImages[imageNo] = new ImageIcon("img/BlueTruck" + imageNo
 					+ ".png").getImage();
 		}
 
@@ -107,23 +107,23 @@ public class SodasplosionGrid extends JPanel
 		// for each tile is nothing
 		gridImages = new Image[9];
 		EMPTY = 0;
-		gridImages[1] = new ImageIcon("Tire.png").getImage();
+		gridImages[1] = new ImageIcon("img/Tire.png").getImage();
 		TIRE = 1;
-		gridImages[2] = new ImageIcon("Mentos.png").getImage();
+		gridImages[2] = new ImageIcon("img/Mentos.png").getImage();
 		MENTOS = 2;
-		gridImages[3] = new ImageIcon("Can.png").getImage();
+		gridImages[3] = new ImageIcon("img/Can.png").getImage();
 		CAN = 3;
-		gridImages[4] = new ImageIcon("Building.png").getImage();
+		gridImages[4] = new ImageIcon("img/Building.png").getImage();
 		BUILDING = 4;
-		gridImages[5] = new ImageIcon("Crate.png").getImage();
+		gridImages[5] = new ImageIcon("img/Crate.png").getImage();
 		CRATE = 5;
-		gridImages[6] = new ImageIcon("RedCan.png").getImage();
+		gridImages[6] = new ImageIcon("img/RedCan.png").getImage();
 		REDCAN = 6;
-		gridImages[7] = new ImageIcon("BlueCan.png").getImage();
+		gridImages[7] = new ImageIcon("img/BlueCan.png").getImage();
 		BLUECAN = 7;
-		gridImages[8] = new ImageIcon("Explosion.png").getImage();
+		gridImages[8] = new ImageIcon("img/Sodasplosion.png").getImage();
 		EXPLOSION = 8;
-		border = new ImageIcon("border.png").getImage();
+		border = new ImageIcon("img/border.png").getImage();
 
 		// Starts a new game and loads up the grid (sets size of grid array)
 		newGame();
@@ -136,11 +136,11 @@ public class SodasplosionGrid extends JPanel
 		this.setPreferredSize(size);
 
 		// Get all the menu images
-		mainMenu = new ImageIcon("MainMenu.png").getImage();
-		startMenu = new ImageIcon("StartMenu.png").getImage();
-		instructions1 = new ImageIcon("Instructions1.png").getImage();
-		instructions2 = new ImageIcon("Instructions2.png").getImage();
-		story = new ImageIcon("Story.png").getImage();
+		mainMenu = new ImageIcon("img/MainMenu.png").getImage();
+		startMenu = new ImageIcon("img/StartMenu.png").getImage();
+		instructions1 = new ImageIcon("img/Instructions1.png").getImage();
+		instructions2 = new ImageIcon("img/Instructions2.png").getImage();
+		story = new ImageIcon("img/Story.png").getImage();
 
 		// Initialize the rectangles
 		START_BUTTON = new Rectangle(170, 453, 150, 40);
