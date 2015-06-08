@@ -1,96 +1,128 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
 /**
- * The grid for Sodasplosion
+ * Handles the grid and menu for Sodasplosion
  *
  * @author Alexander Shah and Amy Zhang
  * @version May 27, 2015
  */
 public class SodasplosionGrid extends JPanel
 {
-	// Set up variables
-	private final int IMAGE_WIDTH, IMAGE_HEIGHT;
-
-	private Image gridImages[];
-	private Image playerImages[];
-
-	Player playerOne = new Player();
-	Player playerTwo = new Player();
-
-	private Image border;
-
-	int playerOnePos = 0;
-	int playerTwoPos = 4;
-
-	private int[][] grid;
-	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
-
-	final int EMPTY, TIRE, MENTOS, CAN, BUILDING, CRATE, REDCAN, BLUECAN,
-			EXPLOSION;
-
-	Timer[] explosion;
-
-	private int[] canRows, canCols;
-
-	private final Image mainMenu, startMenu, instructions1, instructions2,
-			story;
-
-	private Rectangle START_BUTTON, STORY_BUTTON, BACK_MENU_BUTTON,
-			INSTRUCTIONS_BUTTON, PAGE_BUTTON, ONE_PLAYER,
-			TWO_PLAYERS, CLASSIC, SHOWDOWN, PLAY_BUTTON;
-
+	// Program constants
+	
+	// Tile size
+	private final int IMAGE_WIDTH = 64;
+	private final int IMAGE_HEIGHT = 64;
+	
+	// Grid
+	private final int EMPTY = 0;
+	private final int TIRE = 1;
+	private final int MENTOS = 2;
+	private final int CAN = 3;
+	private final int BUILDING = 4;
+	private final int CRATE = 5;
+	private final int REDCAN = 6;
+	private final int BLUECAN = 7;
+	private final int EXPLOSION = 8;
+	
+	// Menu 
 	private final int GAME = -1;
 	private final int MAIN_MENU = 1;
 	private final int START_MENU = 2;
 	private final int STORY = 3;
 	private final int INSTRUCTIONS_1 = 4;
 	private final int INSTRUCTIONS_2 = 5;
-	private int start = 0;
-	Font font = new Font("Serif", Font.BOLD, 12);
 
-	private Rectangle NO_OF_ROUNDS[] = new Rectangle[10];
-	private int menu = GAME; // = MAIN_MENU;
+	// Program variables
+	
+	// Grid
+	private int[][] grid;
+	private Image border;
+	private Image gridImages[];
+	
+	// Player 
+	private Player playerOne = new Player();
+	private Player playerTwo = new Player();
+	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
+	private int[] canRows, canCols;
+	private Image playerImages[];
+	private int playerOneImg = 0;
+	private int playerTwoImg = 4;
+	private Timer[] explosion;
+
+	// Game options
+	private int start = 0;
+	private Font font = new Font("Serif", Font.BOLD, 12);
+	private int menu = MAIN_MENU;// GAME
 	private int noOfPlayers = 0;
 	private int noOfRounds = 0;
 	private int mapType = 0;
+
+	// Rectangles for the menu screens
+	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
+	private Rectangle STORY_BUTTON = new Rectangle(366, 453, 150, 40);
+	private Rectangle INSTRUCTIONS_BUTTON = new Rectangle(568, 453, 285, 40);
+	private Rectangle BACK_MENU_BUTTON = new Rectangle(760, 723, 250, 35);
+	private Rectangle PAGE_BUTTON = new Rectangle(640, 723, 100, 35);
+	private Rectangle ONE_PLAYER = new Rectangle(45, 78, 150, 150);
+	private Rectangle TWO_PLAYERS = new Rectangle(220, 78, 150, 150);
+	private Rectangle CLASSIC = new Rectangle(560, 73, 150, 150);
+	private Rectangle SHOWDOWN = new Rectangle(787, 73, 150, 150);
+	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
+	private Rectangle[] NO_OF_ROUNDS = new Rectangle[10];
+	
+	// Images for the menu screen
+	private Image mainMenu, startMenu, instructions1, instructions2, story;
 
 	/**
 	 * Constructs a new grid
 	 */
 	public SodasplosionGrid()
 	{
-		explosion = new Timer[10];
+		// Loads up all the images
+		// Leaves gridImages[0] blank so that the default image
+		// for each tile is empty
+		gridImages = new Image[9];
+		playerImages = new Image[8];
 		canRows = new int[10];
 		canCols = new int[10];
 
-		// Loads up the player and breakable block images
-		playerImages = new Image[8];
+		gridImages[1] = new ImageIcon("img/Tire.png").getImage();
+		gridImages[2] = new ImageIcon("img/Mentos.png").getImage();
+		gridImages[3] = new ImageIcon("img/Can.png").getImage();
+		gridImages[4] = new ImageIcon("img/Building.png").getImage();
+		gridImages[5] = new ImageIcon("img/Crate.png").getImage();
+		gridImages[6] = new ImageIcon("img/RedCan.png").getImage();
+		gridImages[7] = new ImageIcon("img/BlueCan.png").getImage();
+		gridImages[8] = new ImageIcon("img/Sodasplosion.png").getImage();
+		border = new ImageIcon("img/border.png").getImage();
 		for (int imageNo = 0; imageNo < 4; imageNo++)
 		{
-			playerImages[imageNo] = new ImageIcon("img/RedTruck" + imageNo + ".png")
-					.getImage();
+			playerImages[imageNo] = new ImageIcon("img/RedTruck" + imageNo
+					+ ".png").getImage();
 		}
 		for (int imageNo = 4; imageNo < 8; imageNo++)
 		{
 			playerImages[imageNo] = new ImageIcon("img/BlueTruck" + imageNo
 					+ ".png").getImage();
 		}
+		mainMenu = new ImageIcon("img/MainMenu.png").getImage();
+		startMenu = new ImageIcon("img/StartMenu.png").getImage();
+		instructions1 = new ImageIcon("img/Instructions1.png").getImage();
+		instructions2 = new ImageIcon("img/Instructions2.png").getImage();
+		story = new ImageIcon("img/Story.png").getImage();
+
+		// Sets up the icons for the number of rounds
+		for (int round = 1; round <= 9; round++)
+		{
+			NO_OF_ROUNDS[round] = new Rectangle(82 + 100 * (round - 1),
+					408, 60, 60);
+		}
 
 		// Sets up the timers for each explosion
+		explosion = new Timer[10];
 		for (int timer = 0; timer < explosion.length / 2; timer++)
 		{
 			explosion[timer] = new Timer(500, new TimerEventHandler(playerOne,
@@ -102,60 +134,13 @@ public class SodasplosionGrid extends JPanel
 					timer));
 		}
 
-		// Loads up the grid images
-		// Leaves gridImages[0] blank so that the default image
-		// for each tile is nothing
-		gridImages = new Image[9];
-		EMPTY = 0;
-		gridImages[1] = new ImageIcon("img/Tire.png").getImage();
-		TIRE = 1;
-		gridImages[2] = new ImageIcon("img/Mentos.png").getImage();
-		MENTOS = 2;
-		gridImages[3] = new ImageIcon("img/Can.png").getImage();
-		CAN = 3;
-		gridImages[4] = new ImageIcon("img/Building.png").getImage();
-		BUILDING = 4;
-		gridImages[5] = new ImageIcon("img/Crate.png").getImage();
-		CRATE = 5;
-		gridImages[6] = new ImageIcon("img/RedCan.png").getImage();
-		REDCAN = 6;
-		gridImages[7] = new ImageIcon("img/BlueCan.png").getImage();
-		BLUECAN = 7;
-		gridImages[8] = new ImageIcon("img/Sodasplosion.png").getImage();
-		EXPLOSION = 8;
-		border = new ImageIcon("img/border.png").getImage();
-
 		// Starts a new game and loads up the grid (sets size of grid array)
 		newGame();
 
 		// Set the image height and width based on the path image size
 		// Also sizes this panel based on the image and grid size
-		IMAGE_WIDTH = 64;
-		IMAGE_HEIGHT = 64;
 		Dimension size = new Dimension(1024, 768);
 		this.setPreferredSize(size);
-
-		// Get all the menu images
-		mainMenu = new ImageIcon("img/MainMenu.png").getImage();
-		startMenu = new ImageIcon("img/StartMenu.png").getImage();
-		instructions1 = new ImageIcon("img/Instructions1.png").getImage();
-		instructions2 = new ImageIcon("img/Instructions2.png").getImage();
-		story = new ImageIcon("img/Story.png").getImage();
-
-		// Initialize the rectangles
-		START_BUTTON = new Rectangle(170, 453, 150, 40);
-		STORY_BUTTON = new Rectangle(366, 453, 150, 40);
-		INSTRUCTIONS_BUTTON = new Rectangle(568, 453, 285, 40);
-		BACK_MENU_BUTTON = new Rectangle(760, 723, 250, 35);
-		PAGE_BUTTON = new Rectangle(640, 723, 100, 35);
-		ONE_PLAYER = new Rectangle(45, 78, 150, 150);
-		TWO_PLAYERS = new Rectangle(220, 78, 150, 150);
-		CLASSIC = new Rectangle(560, 73, 150, 150);
-		SHOWDOWN = new Rectangle(787, 73, 150, 150);
-		PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
-		for (int round = 1; round <= 9; round++)
-			NO_OF_ROUNDS[round] = new Rectangle(82 + 100 * (round - 1), 408,
-					60, 60);
 
 		// Add mouse listeners to the panel
 		this.addMouseListener(new MouseHandler());
@@ -172,18 +157,17 @@ public class SodasplosionGrid extends JPanel
 	 */
 	public void newGame()
 	{
-		// Initial position of the player
+		// Declares number of rows and number of columns and sets up an array to
+		// keep track of the grid
+		int noOfRows = 11;
+		int noOfColumns = 13;
+		grid = new int[noOfRows][noOfColumns];
+
+		// Sets the initial positions for player one and player two
 		currentRowOne = 0;
 		currentColOne = 0;
 		currentRowTwo = 10;
 		currentColTwo = 12;
-
-		// Declares number of rows and number of columns
-		int noOfRows = 11;
-		int noOfColumns = 13;
-
-		// Set up the array
-		grid = new int[noOfRows][noOfColumns];
 
 		// Adds the buildings to the grid
 		for (int row = 1; row < grid.length; row++)
@@ -197,68 +181,97 @@ public class SodasplosionGrid extends JPanel
 			}
 		}
 
-		// Adds the crates to the grid
-		for (int row = 0; row < grid.length; row++)
+		// Adds crates to the grid if the classic game mode is set
+		// Gives both players full power if the showdown game mode is set
+		if (mapType == 0)
 		{
-			for (int column = 0; column < grid[0].length; column++)
+			for (int row = 0; row < grid.length; row++)
 			{
-				if (grid[row][column] !=
-						BUILDING && (row > 1 || column > 1)
-						&& (row < 9 || column < 11) &&
-						Math.random() * 10 <= 7.5)
+				for (int column = 0; column < grid[0].length; column++)
 				{
-					grid[row][column] = CRATE;
+					if (grid[row][column] != BUILDING
+							&& (row > 1 || column > 1)
+							&& (row < 9 || column < 11)
+							&& Math.random() * 10 <= 7.5)
+					{
+						grid[row][column] = CRATE;
+					}
 				}
 			}
 		}
-
-	}
-
-	public void placeCan(Player player, int canRow, int canCol)
-	{
-		if (player.getCurrentCans() > 0)
+		else
 		{
-			player.placeCan();
-
-			int currentCanPos = player.getCurrentCans();
-
-			// Sets the current can's row and column and starts the explosion
-			// timer
-			if (player == playerOne)
+			for (int power = 1; power < 5; power++)
 			{
-				grid[canRow][canCol] = REDCAN;
-				canRows[currentCanPos] = canRow;
-				canCols[currentCanPos] = canCol;
-				explosion[currentCanPos].start();
-			}
-			else
-			{
-				grid[canRow][canCol] = BLUECAN;
-				canRows[currentCanPos + 5] = canRow;
-				canCols[currentCanPos + 5] = canCol;
-				explosion[currentCanPos + 5].start();
+				playerOne.addPower(1);
+				playerOne.addPower(2);
+				playerOne.addPower(3);
+				playerTwo.addPower(1);
+				playerTwo.addPower(2);
+				playerTwo.addPower(3);
 			}
 		}
 	}
 
 	/**
-	 * An inner class to deal with the timer events
+	 * Checks to see if the given player can place a can and if so, starts the
+	 * sodasplosion timer
+	 * 
+	 * @param player the given player
+	 * @param row the row of the given player
+	 * @param col the column of the given player
+	 */
+	public void placeCan(Player player, int row, int col)
+	{
+		// If the player has at least one can, places the can on the ground,
+		// checks to see which can is being placed (e.g. 1st can, 2nd can, etc),
+		// sets the current can's row and column, and starts the explosion
+		// timer
+		if (player.getCurrentCans() > 0)
+		{
+			player.placeCan();
+			int canPos = player.getCurrentCans();
+
+			if (player == playerOne)
+			{
+				grid[row][col] = REDCAN;
+				canRows[canPos] = row;
+				canCols[canPos] = col;
+				explosion[canPos].start();
+			}
+			else
+			{
+				grid[row][col] = BLUECAN;
+				canRows[canPos + 5] = row;
+				canCols[canPos + 5] = col;
+				explosion[canPos + 5].start();
+			}
+		}
+	}
+
+	/**
+	 * An inner class that deals with the timer events
+	 * 
+	 * @author Alexander Shah and Amy Zhang
+	 * @version Jun 8, 2015
 	 */
 	private class TimerEventHandler implements ActionListener
 	{
-		int whichExplosion, counter, range, currentCanRow, currentCanCol;
 		Player player;
+		int canPos, counter, range, currentCanRow, currentCanCol;
 
 		/**
 		 * Constructor for the TimerEventHandler
 		 * 
 		 * @param player the given player
-		 * @param whichExplosion the given explosion
+		 * @param canPos which can is being placed (e.g 1st can)
 		 */
-		public TimerEventHandler(Player player, int whichExplosion)
+		public TimerEventHandler(Player player, int canPos)
 		{
 			this.player = player;
-			this.whichExplosion = whichExplosion;
+			this.canPos = canPos;
+			// Sets all the initial values to 0 so that there
+			// is no error message
 			counter = 0;
 			range = 0;
 			currentCanRow = 0;
@@ -266,7 +279,10 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		/**
-		 * Acts upon a fired timer Explodes the can and checks for collisions
+		 * Acts upon a fired timer Creates a sodasplosion and checks for
+		 * collisions Uses multiple timer fires to animate the explosion
+		 * 
+		 * @param event the Timer event
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
@@ -275,16 +291,15 @@ public class SodasplosionGrid extends JPanel
 			if (counter == 1)
 			{
 				range = player.getRange();
-				currentCanRow = canRows[whichExplosion];
-				currentCanCol = canCols[whichExplosion];
+				currentCanRow = canRows[canPos];
+				currentCanCol = canCols[canPos];
 			}
 			else if (counter == 5)
 			{
 				grid[currentCanRow][currentCanCol] = EXPLOSION;
 
-				boolean alreadyHitSomething = false;
-
 				// Collision code for the upwards direction
+				boolean alreadyHitSomething = false;
 				for (int upPos = 1; upPos <= range
 						&& currentCanRow - upPos >= 0
 						&& grid[currentCanRow - upPos][currentCanCol] != BUILDING
@@ -293,6 +308,7 @@ public class SodasplosionGrid extends JPanel
 					if (grid[currentCanRow - upPos][currentCanCol] == CRATE)
 					{
 						int item = (int) (Math.random() * 10);
+
 						if (item <= 3)
 						{
 							grid[currentCanRow - upPos][currentCanCol] = item;
@@ -310,9 +326,8 @@ public class SodasplosionGrid extends JPanel
 					}
 				}
 
-				alreadyHitSomething = false;
-
 				// Collision code for the downwards direction
+				alreadyHitSomething = false;
 				for (int downPos = 1; downPos <= range
 						&& currentCanRow + downPos < grid.length
 						&& grid[currentCanRow + downPos][currentCanCol] != BUILDING
@@ -321,6 +336,7 @@ public class SodasplosionGrid extends JPanel
 					if (grid[currentCanRow + downPos][currentCanCol] == CRATE)
 					{
 						int item = (int) (Math.random() * 10);
+
 						if (item <= 3)
 						{
 							grid[currentCanRow + downPos][currentCanCol] = item;
@@ -338,9 +354,8 @@ public class SodasplosionGrid extends JPanel
 					}
 				}
 
-				alreadyHitSomething = false;
-
 				// Collision code for the left direction
+				alreadyHitSomething = false;
 				for (int leftPos = 1; leftPos <= range
 						&& currentCanCol - leftPos >= 0
 						&& grid[currentCanRow][currentCanCol - leftPos] != BUILDING
@@ -349,6 +364,7 @@ public class SodasplosionGrid extends JPanel
 					if (grid[currentCanRow][currentCanCol - leftPos] == CRATE)
 					{
 						int item = (int) (Math.random() * 10);
+
 						if (item <= 3)
 						{
 							grid[currentCanRow][currentCanCol - leftPos] = item;
@@ -366,9 +382,8 @@ public class SodasplosionGrid extends JPanel
 					}
 				}
 
-				alreadyHitSomething = false;
-
 				// Collision code for the right direction
+				alreadyHitSomething = false;
 				for (int rightPos = 1; rightPos <= range
 						&& currentCanCol + rightPos < grid[0].length
 						&& grid[currentCanRow][currentCanCol + rightPos] != BUILDING
@@ -377,6 +392,7 @@ public class SodasplosionGrid extends JPanel
 					if (grid[currentCanRow][currentCanCol + rightPos] == CRATE)
 					{
 						int item = (int) (Math.random() * 10);
+
 						if (item <= 3)
 						{
 							grid[currentCanRow][currentCanCol + rightPos] = item;
@@ -394,32 +410,27 @@ public class SodasplosionGrid extends JPanel
 					}
 				}
 			}
+			// Clears all explosion images
 			else if (counter == 6)
 			{
 				grid[currentCanRow][currentCanCol] = EMPTY;
 
-				int clearPos = 1;
-				while (currentCanRow - clearPos >= 0
-						&& grid[currentCanRow - clearPos][currentCanCol] == EXPLOSION)
+				for (int upPos = 1; currentCanRow - upPos >= 0
+						&& grid[currentCanRow - upPos][currentCanCol] == EXPLOSION; upPos++)
 				{
-					grid[currentCanRow - clearPos][currentCanCol] = EMPTY;
-					clearPos++;
+					grid[currentCanRow - upPos][currentCanCol] = EMPTY;
 				}
 
-				clearPos = 1;
-				while (currentCanRow + clearPos < grid.length
-						&& grid[currentCanRow + clearPos][currentCanCol] == EXPLOSION)
+				for (int downPos = 1; currentCanRow + downPos < grid.length
+						&& grid[currentCanRow + downPos][currentCanCol] == EXPLOSION; downPos++)
 				{
-					grid[currentCanRow + clearPos][currentCanCol] = EMPTY;
-					clearPos++;
+					grid[currentCanRow + downPos][currentCanCol] = EMPTY;
 				}
 
-				clearPos = 1;
-				while (currentCanCol - clearPos >= 0
-						&& grid[currentCanRow][currentCanCol - clearPos] == EXPLOSION)
+				for (int leftPos = 1; currentCanCol - leftPos >= 0
+						&& grid[currentCanRow][currentCanCol - leftPos] == EXPLOSION; leftPos++)
 				{
-					grid[currentCanRow][currentCanCol - clearPos] = EMPTY;
-					clearPos++;
+					grid[currentCanRow][currentCanCol - leftPos] = EMPTY;
 				}
 
 				for (int rightPos = 1; currentCanCol + rightPos < grid[0].length
@@ -428,9 +439,10 @@ public class SodasplosionGrid extends JPanel
 					grid[currentCanRow][currentCanCol + rightPos] = EMPTY;
 				}
 
-				// Resets the timer and returns the can to the given player
+				// Resets the timer, resets the counter, and returns
+				// the can to the given player
 				player.returnCan();
-				explosion[whichExplosion].stop();
+				explosion[canPos].stop();
 				counter = 0;
 			}
 
@@ -439,105 +451,29 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/**
-	 * Repaint the drawing panel
+	 * Checks if all settings has been selected
 	 * 
-	 * @param g The Graphics context
-	 */
-	public void paintComponent(Graphics g)
-	{
-		super.paintComponent(g);
-		g.setColor(Color.WHITE);
-		g.drawImage(border, 128, 0, this);
-
-		if (menu == GAME)
-		{
-			g.drawImage(border, 128, 0, this);
-
-			// Redraw the grid with current images
-			for (int row = 0; row < grid.length; row++)
-			{
-				for (int column = 0; column < grid[0].length; column++)
-				{
-					g.drawImage(gridImages[grid[row][column]], column
-							* IMAGE_WIDTH
-							+ 160,
-							row * IMAGE_HEIGHT + 32, this);
-				}
-			}
-
-			// Draw the moving player on top of the grid
-			g.drawImage(playerImages[playerOnePos],
-					currentColOne * IMAGE_WIDTH + 160,
-					currentRowOne * IMAGE_HEIGHT + 32, this);
-
-			g.drawImage(playerImages[playerTwoPos],
-					currentColTwo * IMAGE_WIDTH + 160,
-					currentRowTwo * IMAGE_HEIGHT + 32, this);
-		}
-		else if (menu == MAIN_MENU)
-		{
-			g.drawImage(mainMenu, 0, 0, this);
-		}
-		else if (menu == START_MENU)
-		{
-			g.drawImage(startMenu, 0, 0, this);
-			if (!canPlay())
-			{
-				g.setFont(font);
-				g.drawString("PLEASE SELECT GAME SETTINGS", 430, 515);
-			}
-			if (noOfPlayers == 1)
-				g.drawRect(40, 73, 160, 160);
-			else if (noOfPlayers == 2)
-				g.drawRect(215, 73, 160, 160);
-
-			if (mapType == 1)
-				g.drawRect(555, 68, 160, 160);
-			else if (mapType == 2)
-				g.drawRect(782, 68, 160, 160);
-
-			if (noOfRounds > 0)
-				g.drawRect(100 * (noOfRounds - 1) + 77, 403, 70, 70);
-		}
-		else if (menu == STORY)
-		{
-			g.drawImage(story, 0, 0, this);
-		}
-		else if (menu == INSTRUCTIONS_1)
-		{
-			g.drawImage(instructions1, 0, 0, this);
-		}
-		else if (menu == INSTRUCTIONS_2)
-		{
-			g.drawImage(instructions2, 0, 0, this);
-		}
-	}
-
-	/**
-	 * Checks if all settings (map type, number of rounds, and number of
-	 * players) has been selected
-	 * @return whether or not the game can start depending on if the settings
-	 *         have been set
+	 * @return whether or not the game can start (if all the settings have been
+	 *         set)
 	 */
 	private boolean canPlay()
 	{
-		if (noOfPlayers > 0 && noOfRounds > 0 && mapType > 0)
-			return true;
-		else
-			return false;
+		return (noOfPlayers > 0 && noOfRounds > 0 && mapType > 0);
 	}
 
 	/**
-	 * Handles mouse clicks
-	 * @author Amy Zhang
+	 * Inner class to deal with mouse presses
+	 *
+	 * @author Alexander Shah and Amy Zhang
+	 * @version Jun 7, 2015
 	 */
 	private class MouseHandler extends MouseAdapter
 	{
 
 		/**
 		 * Responds to a mousePressed event
-		 * @param event Information about the the mouse when its button was
-		 *            pressed.
+		 * 
+		 * @param event the mousePressed event
 		 */
 		public void mousePressed(MouseEvent event)
 		{
@@ -576,8 +512,12 @@ public class SodasplosionGrid extends JPanel
 					else
 					{
 						for (int round = 1; round <= 9; round++)
+						{
 							if (NO_OF_ROUNDS[round].contains(pressed))
+							{
 								noOfRounds = round;
+							}
+						}
 					}
 
 					// If a player has selected all the settings, start game
@@ -601,26 +541,50 @@ public class SodasplosionGrid extends JPanel
 			else
 			{
 				if (START_BUTTON.contains(pressed))
+				{
 					menu = START_MENU;
+				}
 				else if (STORY_BUTTON.contains(pressed))
+				{
 					menu = STORY;
+				}
 				else if (INSTRUCTIONS_BUTTON.contains(pressed))
+				{
 					menu = INSTRUCTIONS_1;
+				}
 				// setCursor(Cursor.getDefaultCursor());
 			}
 			repaint();
 		}
 	}
 
-	// Inner class to handle key events
+	/**
+	 * Inner class to deal with key presses
+	 *
+	 * @author Alexander Shah and Amy Zhang
+	 * @version Jun 7, 2015
+	 */
 	private class KeyHandler extends KeyAdapter
 	{
+		/**
+		 * Acts on a keyPressed event
+		 * 
+		 * @param event the given Key event
+		 */
 		public void keyPressed(KeyEvent event)
 		{
-			// Change the currentRow and currentColumn of the first player
+			// Change the currentRow and currentColumn of the player
 			// based on the key pressed
-			// If the player is trying to move, make sure player cannot move
-			// past border or go through an unbreakable block
+
+			// If the player is trying to move, makes sure that the player
+			// cannot move past the border or go through an unbreakable block
+
+			// Calls placeCan method whenever the user attempts to place a can
+
+			// If the player steps on a power-up, that skill type is increased
+			// by one level
+
+			// Player One
 			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
 					&& grid[currentRowOne][currentColOne - 1] != BUILDING
 					&& grid[currentRowOne][currentColOne - 1] != CRATE
@@ -628,7 +592,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
 			{
 				currentColOne--;
-				playerOnePos = 0;
+				playerOneImg = 0;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_D
 					&& currentColOne < grid[0].length - 1
@@ -638,7 +602,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne][currentColOne + 1] != BLUECAN)
 			{
 				currentColOne++;
-				playerOnePos = 2;
+				playerOneImg = 2;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_W && currentRowOne > 0
 					&& grid[currentRowOne - 1][currentColOne] != BUILDING
@@ -647,7 +611,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne--;
-				playerOnePos = 1;
+				playerOneImg = 1;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_S
 					&& currentRowOne < grid.length - 1
@@ -657,15 +621,13 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
 			{
 				currentRowOne++;
-				playerOnePos = 3;
+				playerOneImg = 3;
 			}
-			// Places a can
 			else if (event.getKeyCode() == KeyEvent.VK_Q)
 			{
 				placeCan(playerOne, currentRowOne, currentColOne);
 			}
 
-			// Checks to see if the player is standing on a power-up
 			if (grid[currentRowOne][currentColOne] == TIRE ||
 					grid[currentRowOne][currentColOne] == MENTOS ||
 					grid[currentRowOne][currentColOne] == CAN)
@@ -674,10 +636,7 @@ public class SodasplosionGrid extends JPanel
 				grid[currentRowOne][currentColOne] = EMPTY;
 			}
 
-			// Change the currentRow and currentColumn of the second player
-			// based on the key pressed
-			// If the player is trying to move, make sure player cannot move
-			// past border or go through an unbreakable block
+			// Player two
 			if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
 					&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
 					&& grid[currentRowTwo][currentColTwo - 1] != CRATE
@@ -685,7 +644,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
 			{
 				currentColTwo--;
-				playerTwoPos = 4;
+				playerTwoImg = 4;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_RIGHT
 					&& currentColTwo < grid[0].length - 1
@@ -695,7 +654,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
 			{
 				currentColTwo++;
-				playerTwoPos = 6;
+				playerTwoImg = 6;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_UP && currentRowTwo > 0
 					&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
@@ -704,7 +663,7 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo--;
-				playerTwoPos = 5;
+				playerTwoImg = 5;
 			}
 			else if (event.getKeyCode() == KeyEvent.VK_DOWN
 					&& currentRowTwo < grid.length - 1
@@ -714,15 +673,13 @@ public class SodasplosionGrid extends JPanel
 					&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
 			{
 				currentRowTwo++;
-				playerTwoPos = 7;
+				playerTwoImg = 7;
 			}
-			// Places a can
 			else if (event.getKeyCode() == KeyEvent.VK_SLASH)
 			{
 				placeCan(playerTwo, currentRowTwo, currentColTwo);
 			}
 
-			// Checks to see if the player is standing on a power-up
 			if (grid[currentRowTwo][currentColTwo] == TIRE ||
 					grid[currentRowTwo][currentColTwo] == MENTOS ||
 					grid[currentRowTwo][currentColTwo] == CAN)
@@ -731,8 +688,93 @@ public class SodasplosionGrid extends JPanel
 				grid[currentRowTwo][currentColTwo] = EMPTY;
 			}
 
-			// Repaint the screen after the change
+			// Repaints the screen after the changes
 			repaint();
+		}
+	}
+
+	/**
+	 * Repaint the drawing panel
+	 * 
+	 * @param g The Graphics context
+	 */
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		g.setColor(Color.WHITE);
+		g.drawImage(border, 128, 0, this);
+
+		// Redraws the grid with current images and draws the players on top of
+		// the grid if the game is selected
+		// Draws a menu screen if one of the menus are selected
+		if (menu == GAME)
+		{
+			g.drawImage(border, 128, 0, this);
+
+			for (int row = 0; row < grid.length; row++)
+			{
+				for (int column = 0; column < grid[0].length; column++)
+				{
+					g.drawImage(gridImages[grid[row][column]], column
+							* IMAGE_WIDTH + 160, row * IMAGE_HEIGHT + 32, this);
+				}
+			}
+
+			g.drawImage(playerImages[playerOneImg], currentColOne * IMAGE_WIDTH
+					+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
+
+			g.drawImage(playerImages[playerTwoImg], currentColTwo * IMAGE_WIDTH
+					+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
+		}
+		else if (menu == MAIN_MENU)
+		{
+			g.drawImage(mainMenu, 0, 0, this);
+		}
+		else if (menu == START_MENU)
+		{
+			g.drawImage(startMenu, 0, 0, this);
+
+			if (!canPlay())
+			{
+				g.setFont(font);
+				g.drawString("PLEASE SELECT GAME SETTINGS", 430, 515);
+			}
+
+			// Draws a white rectangle around the setting that has been selected
+			if (noOfPlayers == 1)
+			{
+				g.drawRect(40, 73, 160, 160);
+			}
+			else if (noOfPlayers == 2)
+			{
+				g.drawRect(215, 73, 160, 160);
+			}
+
+			if (mapType == 1)
+			{
+				g.drawRect(555, 68, 160, 160);
+			}
+			else if (mapType == 2)
+			{
+				g.drawRect(782, 68, 160, 160);
+			}
+
+			if (noOfRounds > 0)
+			{
+				g.drawRect(100 * (noOfRounds - 1) + 77, 403, 70, 70);
+			}
+		}
+		else if (menu == STORY)
+		{
+			g.drawImage(story, 0, 0, this);
+		}
+		else if (menu == INSTRUCTIONS_1)
+		{
+			g.drawImage(instructions1, 0, 0, this);
+		}
+		else if (menu == INSTRUCTIONS_2)
+		{
+			g.drawImage(instructions2, 0, 0, this);
 		}
 	}
 }

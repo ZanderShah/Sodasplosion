@@ -1,6 +1,4 @@
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 /**
@@ -13,23 +11,28 @@ public class SodasplosionMain extends JFrame
 {
 	SodasplosionGrid sodasplosionGrid;
 
+	/**
+	 * Constructs a new SodasplosionMain frame
+	 */
 	public SodasplosionMain()
 	{
 		// Set up the frame and the grid
 		super("Sodasplosion");
 		setResizable(false);
-		setIconImage(Toolkit.getDefaultToolkit().getImage("connectFourIcon.png"));
-
-		// Set up for the maze area	
+		setIconImage(Toolkit.getDefaultToolkit().getImage("img/Sodasplosion.png"));
 		sodasplosionGrid = new SodasplosionGrid();
 		add(new SodasplosionGrid(), BorderLayout.CENTER);
 	}
 
-	// Sets up the main frame for the game
+	/**
+	 * Starts up the SodaSplosionMain frame
+	 * @param args An array of Strings (ignored)
+	 */
 	public static void main(String[] args)
 	{
 		SodasplosionMain frame = new SodasplosionMain();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.setUndecorated(true);
 		frame.pack();
 		frame.setVisible(true);
 	}

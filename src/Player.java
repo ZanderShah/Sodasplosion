@@ -1,22 +1,21 @@
-import java.awt.Color;
-
 /**
  * Creates a player object
  *
- * @author Alexander Shah
+ * @author Alexander Shah and Amy Zhang
  * @version Jun 1, 2015
  */
 public class Player
 {
 	private int[] powerUps;
 	private int currentCans;
-	
 
 	/**
 	 * Constructs a player object, starting all power ups at 1
 	 */
 	public Player()
 	{
+		// 0 is left empty so that the power-ups do not interfere with the
+		// empty tiles
 		// 1 is speed
 		// 2 is strength
 		// 3 is total cans
@@ -29,7 +28,7 @@ public class Player
 
 	/**
 	 * Adds one power level to the player's given skill as long as it isn't
-	 * capped
+	 * already at max power
 	 * 
 	 * @param type the given item type
 	 */
@@ -39,10 +38,12 @@ public class Player
 		{
 			powerUps[type]++;
 			if (type == 3)
+			{
 				currentCans++;
+			}
 		}
 	}
-	
+
 	/**
 	 * Returns the given player's speed
 	 */
@@ -50,15 +51,15 @@ public class Player
 	{
 		return powerUps[1];
 	}
-	
+
 	/**
-	 * Returns the given player's sodasplosion range
+	 * Returns the given player's blast range
 	 */
 	public int getRange()
 	{
 		return powerUps[2];
 	}
-	
+
 	/**
 	 * Returns the given player's total number of cans
 	 */
@@ -66,7 +67,7 @@ public class Player
 	{
 		return powerUps[3];
 	}
-	
+
 	/**
 	 * Returns the given player's current cans
 	 */
@@ -74,7 +75,7 @@ public class Player
 	{
 		return currentCans;
 	}
-	
+
 	/**
 	 * Removes a can from the given player
 	 */
@@ -89,10 +90,5 @@ public class Player
 	public void returnCan()
 	{
 		currentCans++;
-	}
-	
-	public String toString()
-	{
-		return "Player One:";
 	}
 }
