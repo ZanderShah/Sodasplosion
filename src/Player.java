@@ -7,7 +7,7 @@
 public class Player
 {
 	private int[] powerUps;
-	private int currentCans;
+	private int currentCans, noOfLives;
 
 	/**
 	 * Constructs a player object, starting all power ups at 1
@@ -16,7 +16,7 @@ public class Player
 	{
 		// 0 is left empty so that the power-ups do not interfere with the
 		// empty tiles
-		// 1 is speed
+		// 1 is number of lives
 		// 2 is strength
 		// 3 is total cans
 		powerUps = new int[4];
@@ -36,22 +36,37 @@ public class Player
 	{
 		if (powerUps[type] < 5)
 		{
-			powerUps[type]++;
-			if (type == 3)
+			if ((type == 2 || type == 3) && powerUps[type] < 5)
 			{
-				currentCans++;
+				powerUps[type]++;
+				if (type == 3)
+				{
+					currentCans++;
+				}
 			}
+			else if (type == 1 && powerUps[type] < 3)
+			{
+				powerUps[type]++;	
+			}	
 		}
 	}
 
 	/**
 	 * Returns the given player's speed
 	 */
-	public int getSpeed()
+	public int getNoOfLives()
 	{
 		return powerUps[1];
 	}
 
+	/**
+	 * Takes away a life from the given player
+	 */
+	public void loseLife()
+	{
+		powerUps[1]--;
+	}
+	
 	/**
 	 * Returns the given player's blast range
 	 */

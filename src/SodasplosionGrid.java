@@ -58,7 +58,7 @@ public class SodasplosionGrid extends JPanel
 	private int menu = MAIN_MENU;// GAME
 	private int noOfPlayers = 0;
 	private int noOfRounds = 0;
-	private int mapType = 0;
+	private int mapType = 1;
 
 	// Rectangles for the menu screens
 	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
@@ -134,9 +134,6 @@ public class SodasplosionGrid extends JPanel
 					timer));
 		}
 
-		// Starts a new game and loads up the grid (sets size of grid array)
-		newGame();
-
 		// Set the image height and width based on the path image size
 		// Also sizes this panel based on the image and grid size
 		Dimension size = new Dimension(1024, 768);
@@ -183,7 +180,7 @@ public class SodasplosionGrid extends JPanel
 
 		// Adds crates to the grid if the classic game mode is set
 		// Gives both players full power if the showdown game mode is set
-		if (mapType == 0)
+		if (mapType == 1)
 		{
 			for (int row = 0; row < grid.length; row++)
 			{
@@ -445,7 +442,6 @@ public class SodasplosionGrid extends JPanel
 				explosion[canPos].stop();
 				counter = 0;
 			}
-
 			repaint();
 		}
 	}
@@ -484,7 +480,9 @@ public class SodasplosionGrid extends JPanel
 			{
 				// Go to main menu if back to main menu button is pressed
 				if (BACK_MENU_BUTTON.contains(pressed))
+				{
 					menu = MAIN_MENU;
+				}
 
 				// When on the start menu, set game variables based buttons
 				// clicked on mouse
@@ -520,20 +518,26 @@ public class SodasplosionGrid extends JPanel
 						}
 					}
 
-					// If a player has selected all the settings, start game
+					// If a player has selected all the settings,
+					// starts a new game and loads up the grid (sets size of grid array)
 					if (canPlay() && PLAY_BUTTON.contains(pressed))
 					{
 						start = 1;
 						menu = GAME;
+						newGame();
 					}
 				}
 				// Allow user to change pages between the instruction menus
 				else if (PAGE_BUTTON.contains(pressed))
 				{
 					if (menu == INSTRUCTIONS_1)
+					{
 						menu = INSTRUCTIONS_2;
+					}
 					else if (menu == INSTRUCTIONS_2)
+					{
 						menu = INSTRUCTIONS_1;
+					}
 				}
 			}
 			// When on the main menu, go to appropriate screen when button is
@@ -552,7 +556,6 @@ public class SodasplosionGrid extends JPanel
 				{
 					menu = INSTRUCTIONS_1;
 				}
-				// setCursor(Cursor.getDefaultCursor());
 			}
 			repaint();
 		}
@@ -687,7 +690,6 @@ public class SodasplosionGrid extends JPanel
 				playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
 				grid[currentRowTwo][currentColTwo] = EMPTY;
 			}
-
 			// Repaints the screen after the changes
 			repaint();
 		}
