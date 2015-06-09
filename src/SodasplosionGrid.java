@@ -40,6 +40,7 @@ public class SodasplosionGrid extends JPanel
 	// Grid
 	private int[][] grid;
 	private Image border;
+	private Image sidebar;
 	private Image gridImages[];
 	
 	// Player 
@@ -60,6 +61,9 @@ public class SodasplosionGrid extends JPanel
 	private int noOfRounds = 0;
 	private int mapType = 1;
 
+	//Rectangles for in-game sidebar
+	//private Rectangle IN_GAME_BACK = new Rectangle() 
+	
 	// Rectangles for the menu screens
 	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
 	private Rectangle STORY_BUTTON = new Rectangle(366, 453, 150, 40);
@@ -98,6 +102,7 @@ public class SodasplosionGrid extends JPanel
 		gridImages[7] = new ImageIcon("img/BlueCan.png").getImage();
 		gridImages[8] = new ImageIcon("img/Sodasplosion.png").getImage();
 		border = new ImageIcon("img/border.png").getImage();
+		sidebar = new ImageIcon("img/Sidebar.png").getImage();
 		for (int imageNo = 0; imageNo < 4; imageNo++)
 		{
 			playerImages[imageNo] = new ImageIcon("img/RedTruck" + imageNo
@@ -704,7 +709,6 @@ public class SodasplosionGrid extends JPanel
 	{
 		super.paintComponent(g);
 		g.setColor(Color.WHITE);
-		g.drawImage(border, 128, 0, this);
 
 		// Redraws the grid with current images and draws the players on top of
 		// the grid if the game is selected
@@ -712,6 +716,7 @@ public class SodasplosionGrid extends JPanel
 		if (menu == GAME)
 		{
 			g.drawImage(border, 128, 0, this);
+			g.drawImage(sidebar, 0, 0, this);
 
 			for (int row = 0; row < grid.length; row++)
 			{
