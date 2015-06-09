@@ -11,11 +11,11 @@ import java.awt.event.*;
 public class SodasplosionGrid extends JPanel
 {
 	// Program constants
-	
+
 	// Tile size
 	private final int IMAGE_WIDTH = 64;
 	private final int IMAGE_HEIGHT = 64;
-	
+
 	// Grid
 	private final int EMPTY = 0;
 	private final int TIRE = 1;
@@ -26,8 +26,8 @@ public class SodasplosionGrid extends JPanel
 	private final int REDCAN = 6;
 	private final int BLUECAN = 7;
 	private final int EXPLOSION = 8;
-	
-	// Menu 
+
+	// Menu
 	private final int GAME = -1;
 	private final int MAIN_MENU = 1;
 	private final int START_MENU = 2;
@@ -36,29 +36,27 @@ public class SodasplosionGrid extends JPanel
 	private final int INSTRUCTIONS_2 = 5;
 
 	// Program variables
-	
+
 	// Grid
 	private int[][] grid;
 	private Image border;
 	private Image sidebar;
 	private Image gridImages[];
-	
-	// Player 
+
+	// Player
 	private Player playerOne = new Player();
 	private Player playerTwo = new Player();
 	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
-	private int[] canRows, canCols;
 	private Image playerImages[];
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
-	private Timer[] explosion;
+	private Timer timer;
 
-	// Game options
-	private int start = 0;
+	// Game option
 	private Font font = new Font("Serif", Font.BOLD, 12);
-	private int menu = MAIN_MENU;// GAME
-	private int noOfPlayers = 0;
-	private int noOfRounds = 0;
+	private int menu = MAIN_MENU;
+	private int noOfPlayers = 2;
+	private int noOfRounds = 1;
 	private int mapType = 1;
 
 	//Rectangles for in-game sidebar
@@ -76,7 +74,7 @@ public class SodasplosionGrid extends JPanel
 	private Rectangle SHOWDOWN = new Rectangle(787, 73, 150, 150);
 	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
 	private Rectangle[] NO_OF_ROUNDS = new Rectangle[10];
-	
+
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
 
@@ -90,8 +88,6 @@ public class SodasplosionGrid extends JPanel
 		// for each tile is empty
 		gridImages = new Image[9];
 		playerImages = new Image[8];
-		canRows = new int[10];
-		canCols = new int[10];
 
 		gridImages[1] = new ImageIcon("img/Tire.png").getImage();
 		gridImages[2] = new ImageIcon("img/Mentos.png").getImage();
@@ -126,18 +122,9 @@ public class SodasplosionGrid extends JPanel
 					408, 60, 60);
 		}
 
-		// Sets up the timers for each explosion
-		explosion = new Timer[10];
-		for (int timer = 0; timer < explosion.length / 2; timer++)
-		{
-			explosion[timer] = new Timer(500, new TimerEventHandler(playerOne,
-					timer));
-		}
-		for (int timer = explosion.length / 2; timer < explosion.length; timer++)
-		{
-			explosion[timer] = new Timer(500, new TimerEventHandler(playerTwo,
-					timer));
-		}
+		// Sets up the timer for the explosion
+		timer = new Timer(1000, null);
+		timer.start();
 
 		// Set the image height and width based on the path image size
 		// Also sizes this panel based on the image and grid size
@@ -203,14 +190,13 @@ public class SodasplosionGrid extends JPanel
 		}
 		else
 		{
-			for (int power = 1; power < 5; power++)
+			for (int type = 1; type <= 3; type++)
 			{
-				playerOne.addPower(1);
-				playerOne.addPower(2);
-				playerOne.addPower(3);
-				playerTwo.addPower(1);
-				playerTwo.addPower(2);
-				playerTwo.addPower(3);
+				for (int power = 1; power <= 5; power++)
+				{
+					playerOne.addPower(type);
+					playerTwo.addPower(type);
+				}
 			}
 		}
 	}
@@ -232,22 +218,18 @@ public class SodasplosionGrid extends JPanel
 		if (player.getCurrentCans() > 0)
 		{
 			player.placeCan();
-			int canPos = player.getCurrentCans();
 
 			if (player == playerOne)
 			{
 				grid[row][col] = REDCAN;
-				canRows[canPos] = row;
-				canCols[canPos] = col;
-				explosion[canPos].start();
 			}
 			else
 			{
 				grid[row][col] = BLUECAN;
-				canRows[canPos + 5] = row;
-				canCols[canPos + 5] = col;
-				explosion[canPos + 5].start();
 			}
+
+			timer.addActionListener(new Sodasplosion(player, player.getRange(),
+					row, col));
 		}
 	}
 
@@ -257,10 +239,10 @@ public class SodasplosionGrid extends JPanel
 	 * @author Alexander Shah and Amy Zhang
 	 * @version Jun 8, 2015
 	 */
-	private class TimerEventHandler implements ActionListener
+	private class Sodasplosion implements ActionListener
 	{
 		Player player;
-		int canPos, counter, range, currentCanRow, currentCanCol;
+		int canRow, canCol, range, counter;
 
 		/**
 		 * Constructor for the TimerEventHandler
@@ -268,16 +250,13 @@ public class SodasplosionGrid extends JPanel
 		 * @param player the given player
 		 * @param canPos which can is being placed (e.g 1st can)
 		 */
-		public TimerEventHandler(Player player, int canPos)
+		public Sodasplosion(Player player, int range, int canRow, int canCol)
 		{
 			this.player = player;
-			this.canPos = canPos;
-			// Sets all the initial values to 0 so that there
-			// is no error message
+			this.canRow = canRow;
+			this.canCol = canCol;
+			this.range = range;
 			counter = 0;
-			range = 0;
-			currentCanRow = 0;
-			currentCanCol = 0;
 		}
 
 		/**
@@ -289,177 +268,218 @@ public class SodasplosionGrid extends JPanel
 		public void actionPerformed(ActionEvent event)
 		{
 			counter++;
-
-			if (counter == 1)
+			if (counter == 2)
 			{
-				range = player.getRange();
-				currentCanRow = canRows[canPos];
-				currentCanCol = canCols[canPos];
+				grid[canRow][canCol] = EXPLOSION;
+				checkCollision(canRow, canCol, range);
 			}
-			else if (counter == 5)
+			else if (counter == 3)
 			{
-				grid[currentCanRow][currentCanCol] = EXPLOSION;
-
-				// Collision code for the upwards direction
-				boolean alreadyHitSomething = false;
-				for (int upPos = 1; upPos <= range
-						&& currentCanRow - upPos >= 0
-						&& grid[currentCanRow - upPos][currentCanCol] != BUILDING
-						&& !alreadyHitSomething; upPos++)
-				{
-					if (grid[currentCanRow - upPos][currentCanCol] == CRATE)
-					{
-						int item = (int) (Math.random() * 10);
-
-						if (item <= 3)
-						{
-							grid[currentCanRow - upPos][currentCanCol] = item;
-						}
-						else
-						{
-							grid[currentCanRow - upPos][currentCanCol] = EXPLOSION;
-						}
-
-						alreadyHitSomething = true;
-					}
-					else
-					{
-						grid[currentCanRow - upPos][currentCanCol] = EXPLOSION;
-					}
-				}
-
-				// Collision code for the downwards direction
-				alreadyHitSomething = false;
-				for (int downPos = 1; downPos <= range
-						&& currentCanRow + downPos < grid.length
-						&& grid[currentCanRow + downPos][currentCanCol] != BUILDING
-						&& !alreadyHitSomething; downPos++)
-				{
-					if (grid[currentCanRow + downPos][currentCanCol] == CRATE)
-					{
-						int item = (int) (Math.random() * 10);
-
-						if (item <= 3)
-						{
-							grid[currentCanRow + downPos][currentCanCol] = item;
-						}
-						else
-						{
-							grid[currentCanRow + downPos][currentCanCol] = EXPLOSION;
-						}
-
-						alreadyHitSomething = true;
-					}
-					else
-					{
-						grid[currentCanRow + downPos][currentCanCol] = EXPLOSION;
-					}
-				}
-
-				// Collision code for the left direction
-				alreadyHitSomething = false;
-				for (int leftPos = 1; leftPos <= range
-						&& currentCanCol - leftPos >= 0
-						&& grid[currentCanRow][currentCanCol - leftPos] != BUILDING
-						&& !alreadyHitSomething; leftPos++)
-				{
-					if (grid[currentCanRow][currentCanCol - leftPos] == CRATE)
-					{
-						int item = (int) (Math.random() * 10);
-
-						if (item <= 3)
-						{
-							grid[currentCanRow][currentCanCol - leftPos] = item;
-						}
-						else
-						{
-							grid[currentCanRow][currentCanCol - leftPos] = EXPLOSION;
-						}
-
-						alreadyHitSomething = true;
-					}
-					else
-					{
-						grid[currentCanRow][currentCanCol - leftPos] = EXPLOSION;
-					}
-				}
-
-				// Collision code for the right direction
-				alreadyHitSomething = false;
-				for (int rightPos = 1; rightPos <= range
-						&& currentCanCol + rightPos < grid[0].length
-						&& grid[currentCanRow][currentCanCol + rightPos] != BUILDING
-						&& !alreadyHitSomething; rightPos++)
-				{
-					if (grid[currentCanRow][currentCanCol + rightPos] == CRATE)
-					{
-						int item = (int) (Math.random() * 10);
-
-						if (item <= 3)
-						{
-							grid[currentCanRow][currentCanCol + rightPos] = item;
-						}
-						else
-						{
-							grid[currentCanRow][currentCanCol + rightPos] = EXPLOSION;
-						}
-
-						alreadyHitSomething = true;
-					}
-					else
-					{
-						grid[currentCanRow][currentCanCol + rightPos] = EXPLOSION;
-					}
-				}
-			}
-			// Clears all explosion images
-			else if (counter == 6)
-			{
-				grid[currentCanRow][currentCanCol] = EMPTY;
-
-				for (int upPos = 1; currentCanRow - upPos >= 0
-						&& grid[currentCanRow - upPos][currentCanCol] == EXPLOSION; upPos++)
-				{
-					grid[currentCanRow - upPos][currentCanCol] = EMPTY;
-				}
-
-				for (int downPos = 1; currentCanRow + downPos < grid.length
-						&& grid[currentCanRow + downPos][currentCanCol] == EXPLOSION; downPos++)
-				{
-					grid[currentCanRow + downPos][currentCanCol] = EMPTY;
-				}
-
-				for (int leftPos = 1; currentCanCol - leftPos >= 0
-						&& grid[currentCanRow][currentCanCol - leftPos] == EXPLOSION; leftPos++)
-				{
-					grid[currentCanRow][currentCanCol - leftPos] = EMPTY;
-				}
-
-				for (int rightPos = 1; currentCanCol + rightPos < grid[0].length
-						&& grid[currentCanRow][currentCanCol + rightPos] == EXPLOSION; rightPos++)
-				{
-					grid[currentCanRow][currentCanCol + rightPos] = EMPTY;
-				}
-
-				// Resets the timer, resets the counter, and returns
-				// the can to the given player
+				clearExplosions(canRow, canCol, range);
 				player.returnCan();
-				explosion[canPos].stop();
-				counter = 0;
+				timer.removeActionListener(this);
 			}
 			repaint();
 		}
 	}
 
 	/**
-	 * Checks if all settings has been selected
+	 * Clears all explosions on the board
 	 * 
-	 * @return whether or not the game can start (if all the settings have been
-	 *         set)
+	 * @param canRow the given row of the can
+	 * @param canCol the given col of the can
+	 * @param range the range that the explosion could reach
 	 */
-	private boolean canPlay()
+	public void clearExplosions(int canRow, int canCol, int range)
 	{
-		return (noOfPlayers > 0 && noOfRounds > 0 && mapType > 0);
+		grid[canRow][canCol] = EMPTY;
+		
+		for (int upPos = 1; canRow - upPos >= 0 && upPos <= range; upPos++)
+		{
+			if (grid[canRow - upPos][canCol] == EXPLOSION)
+			{
+				grid[canRow - upPos][canCol] = EMPTY;
+			}
+		}
+		for (int downPos = 1; canRow + downPos < grid.length
+				&& downPos <= range; downPos++)
+		{
+			if (grid[canRow + downPos][canCol] == EXPLOSION)
+			{
+				grid[canRow + downPos][canCol] = EMPTY;
+			}
+		}
+		for (int leftPos = 1; canCol - leftPos >= 0 && leftPos <= range; leftPos++)
+		{
+			if (grid[canRow][canCol - leftPos] == EXPLOSION)
+			{
+				grid[canRow][canCol - leftPos] = EMPTY;
+			}
+		}
+		for (int rightPos = 1; canCol + rightPos < grid[0].length
+				&& rightPos <= range; rightPos++)
+		{
+			if (grid[canRow][canCol + rightPos] == EXPLOSION)
+			{
+				grid[canRow][canCol + rightPos] = EMPTY;
+			}
+		}
+		repaint();
+	}
+
+	public void checkCollision(int canRow, int canCol, int range)
+	{
+		// Collision code for the upwards direction
+		boolean alreadyHitSomething = false;
+		for (int upPos = 1; upPos <= range
+				&& canRow - upPos >= 0
+				&& grid[canRow - upPos][canCol] != BUILDING
+				&& !alreadyHitSomething; upPos++)
+		{
+			if (grid[canRow - upPos][canCol] == CRATE)
+			{
+				int item = (int) (Math.random() * 10);
+
+				if (item <= 3)
+				{
+					grid[canRow - upPos][canCol] = item;
+				}
+				else
+				{
+					grid[canRow - upPos][canCol] = EXPLOSION;
+				}
+
+				alreadyHitSomething = true;
+			}
+			else if (grid[canRow - upPos][canCol] != REDCAN
+					&& grid[canRow - upPos][canCol] != BLUECAN)
+			{
+				grid[canRow - upPos][canCol] = EXPLOSION;
+			}
+
+			if (currentRowOne == canRow - upPos && currentColOne == canCol)
+			{
+				System.out.println("Player One Loses");
+			}
+			if (currentRowTwo == canRow - upPos && currentColTwo == canCol)
+			{
+				System.out.println("Player Two Loses");
+			}
+		}
+
+		// Collision code for the downwards direction
+		alreadyHitSomething = false;
+		for (int downPos = 1; downPos <= range
+				&& canRow + downPos < grid.length
+				&& grid[canRow + downPos][canCol] != BUILDING
+				&& !alreadyHitSomething; downPos++)
+		{
+			if (grid[canRow + downPos][canCol] == CRATE)
+			{
+				int item = (int) (Math.random() * 10);
+
+				if (item <= 3)
+				{
+					grid[canRow + downPos][canCol] = item;
+				}
+				else
+				{
+					grid[canRow + downPos][canCol] = EXPLOSION;
+				}
+
+				alreadyHitSomething = true;
+			}
+			else if (grid[canRow + downPos][canCol] != REDCAN
+					&& grid[canRow + downPos][canCol] != BLUECAN)
+			{
+				grid[canRow + downPos][canCol] = EXPLOSION;
+			}
+
+			if (currentRowOne == canRow + downPos && currentColOne == canCol)
+			{
+				System.out.println("Player One Loses");
+			}
+			if (currentRowTwo == canRow + downPos && currentColTwo == canCol)
+			{
+				System.out.println("Player Two Loses");
+			}
+		}
+
+		// Collision code for the left direction
+		alreadyHitSomething = false;
+		for (int leftPos = 1; leftPos <= range
+				&& canCol - leftPos >= 0
+				&& grid[canRow][canCol - leftPos] != BUILDING
+				&& !alreadyHitSomething; leftPos++)
+		{
+			if (grid[canRow][canCol - leftPos] == CRATE)
+			{
+				int item = (int) (Math.random() * 10);
+
+				if (item <= 3)
+				{
+					grid[canRow][canCol - leftPos] = item;
+				}
+				else
+				{
+					grid[canRow][canCol - leftPos] = EXPLOSION;
+				}
+
+				alreadyHitSomething = true;
+			}
+			else if (grid[canRow][canCol - leftPos] != REDCAN
+					&& grid[canRow][canCol - leftPos] != BLUECAN)
+			{
+				grid[canRow][canCol - leftPos] = EXPLOSION;
+			}
+
+			if (currentRowOne == canRow && currentColOne - leftPos == canCol)
+			{
+				System.out.println("Player One Loses");
+			}
+			if (currentRowTwo == canRow && currentColTwo - leftPos == canCol)
+			{
+				System.out.println("Player Two Loses");
+			}
+		}
+
+		// Collision code for the right direction
+		alreadyHitSomething = false;
+		for (int rightPos = 1; rightPos <= range
+				&& canCol + rightPos < grid[0].length
+				&& grid[canRow][canCol + rightPos] != BUILDING
+				&& !alreadyHitSomething; rightPos++)
+		{
+			if (grid[canRow][canCol + rightPos] == CRATE)
+			{
+				int item = (int) (Math.random() * 10);
+
+				if (item <= 3)
+				{
+					grid[canRow][canCol + rightPos] = item;
+				}
+				else
+				{
+					grid[canRow][canCol + rightPos] = EXPLOSION;
+				}
+
+				alreadyHitSomething = true;
+			}
+			else if (grid[canRow][canCol + rightPos] != REDCAN
+					&& grid[canRow][canCol + rightPos] != BLUECAN)
+			{
+				grid[canRow][canCol + rightPos] = EXPLOSION;
+			}
+
+			if (currentRowOne == canRow && currentColOne + rightPos == canCol)
+			{
+				System.out.println("Player One Loses");
+			}
+			if (currentRowTwo == canRow && currentColTwo + rightPos == canCol)
+			{
+				System.out.println("Player Two Loses");
+			}
+		}
 	}
 
 	/**
@@ -524,10 +544,10 @@ public class SodasplosionGrid extends JPanel
 					}
 
 					// If a player has selected all the settings,
-					// starts a new game and loads up the grid (sets size of grid array)
-					if (canPlay() && PLAY_BUTTON.contains(pressed))
+					// starts a new game and loads up the grid (sets size of
+					// grid array)
+					if (PLAY_BUTTON.contains(pressed))
 					{
-						start = 1;
 						menu = GAME;
 						newGame();
 					}
@@ -581,122 +601,130 @@ public class SodasplosionGrid extends JPanel
 		 */
 		public void keyPressed(KeyEvent event)
 		{
-			// Change the currentRow and currentColumn of the player
-			// based on the key pressed
+			if (menu == GAME)
+			{
+				// Change the currentRow and currentColumn of the player
+				// based on the key pressed
 
-			// If the player is trying to move, makes sure that the player
-			// cannot move past the border or go through an unbreakable block
+				// If the player is trying to move, makes sure that the player
+				// cannot move past the border or go through an unbreakable
+				// block
 
-			// Calls placeCan method whenever the user attempts to place a can
+				// Calls placeCan method whenever the user attempts to place a
+				// can
 
-			// If the player steps on a power-up, that skill type is increased
-			// by one level
+				// If the player steps on a power-up, that skill type is
+				// increased
+				// by one level
 
-			// Player One
-			if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
-					&& grid[currentRowOne][currentColOne - 1] != BUILDING
-					&& grid[currentRowOne][currentColOne - 1] != CRATE
-					&& grid[currentRowOne][currentColOne - 1] != REDCAN
-					&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
-			{
-				currentColOne--;
-				playerOneImg = 0;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_D
-					&& currentColOne < grid[0].length - 1
-					&& grid[currentRowOne][currentColOne + 1] != BUILDING
-					&& grid[currentRowOne][currentColOne + 1] != CRATE
-					&& grid[currentRowOne][currentColOne + 1] != REDCAN
-					&& grid[currentRowOne][currentColOne + 1] != BLUECAN)
-			{
-				currentColOne++;
-				playerOneImg = 2;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_W && currentRowOne > 0
-					&& grid[currentRowOne - 1][currentColOne] != BUILDING
-					&& grid[currentRowOne - 1][currentColOne] != CRATE
-					&& grid[currentRowOne - 1][currentColOne] != REDCAN
-					&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
-			{
-				currentRowOne--;
-				playerOneImg = 1;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_S
-					&& currentRowOne < grid.length - 1
-					&& grid[currentRowOne + 1][currentColOne] != BUILDING
-					&& grid[currentRowOne + 1][currentColOne] != CRATE
-					&& grid[currentRowOne + 1][currentColOne] != REDCAN
-					&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
-			{
-				currentRowOne++;
-				playerOneImg = 3;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_Q)
-			{
-				placeCan(playerOne, currentRowOne, currentColOne);
-			}
+				// Player One
+				if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
+						&& grid[currentRowOne][currentColOne - 1] != BUILDING
+						&& grid[currentRowOne][currentColOne - 1] != CRATE
+						&& grid[currentRowOne][currentColOne - 1] != REDCAN
+						&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
+				{
+					currentColOne--;
+					playerOneImg = 0;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_D
+						&& currentColOne < grid[0].length - 1
+						&& grid[currentRowOne][currentColOne + 1] != BUILDING
+						&& grid[currentRowOne][currentColOne + 1] != CRATE
+						&& grid[currentRowOne][currentColOne + 1] != REDCAN
+						&& grid[currentRowOne][currentColOne + 1] != BLUECAN)
+				{
+					currentColOne++;
+					playerOneImg = 2;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_W
+						&& currentRowOne > 0
+						&& grid[currentRowOne - 1][currentColOne] != BUILDING
+						&& grid[currentRowOne - 1][currentColOne] != CRATE
+						&& grid[currentRowOne - 1][currentColOne] != REDCAN
+						&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
+				{
+					currentRowOne--;
+					playerOneImg = 1;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_S
+						&& currentRowOne < grid.length - 1
+						&& grid[currentRowOne + 1][currentColOne] != BUILDING
+						&& grid[currentRowOne + 1][currentColOne] != CRATE
+						&& grid[currentRowOne + 1][currentColOne] != REDCAN
+						&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
+				{
+					currentRowOne++;
+					playerOneImg = 3;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_Q)
+				{
+					placeCan(playerOne, currentRowOne, currentColOne);
+				}
 
-			if (grid[currentRowOne][currentColOne] == TIRE ||
-					grid[currentRowOne][currentColOne] == MENTOS ||
-					grid[currentRowOne][currentColOne] == CAN)
-			{
-				playerOne.addPower(grid[currentRowOne][currentColOne]);
-				grid[currentRowOne][currentColOne] = EMPTY;
-			}
+				if (grid[currentRowOne][currentColOne] == TIRE ||
+						grid[currentRowOne][currentColOne] == MENTOS ||
+						grid[currentRowOne][currentColOne] == CAN)
+				{
+					playerOne.addPower(grid[currentRowOne][currentColOne]);
+					grid[currentRowOne][currentColOne] = EMPTY;
+				}
 
-			// Player two
-			if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
-					&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
-					&& grid[currentRowTwo][currentColTwo - 1] != CRATE
-					&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
-					&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
-			{
-				currentColTwo--;
-				playerTwoImg = 4;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_RIGHT
-					&& currentColTwo < grid[0].length - 1
-					&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
-					&& grid[currentRowTwo][currentColTwo + 1] != CRATE
-					&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
-					&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
-			{
-				currentColTwo++;
-				playerTwoImg = 6;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_UP && currentRowTwo > 0
-					&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
-					&& grid[currentRowTwo - 1][currentColTwo] != CRATE
-					&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
-					&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
-			{
-				currentRowTwo--;
-				playerTwoImg = 5;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_DOWN
-					&& currentRowTwo < grid.length - 1
-					&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
-					&& grid[currentRowTwo + 1][currentColTwo] != CRATE
-					&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
-					&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
-			{
-				currentRowTwo++;
-				playerTwoImg = 7;
-			}
-			else if (event.getKeyCode() == KeyEvent.VK_SLASH)
-			{
-				placeCan(playerTwo, currentRowTwo, currentColTwo);
-			}
+				// Player two
+				if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
+						&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
+						&& grid[currentRowTwo][currentColTwo - 1] != CRATE
+						&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
+						&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
+				{
+					currentColTwo--;
+					playerTwoImg = 4;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_RIGHT
+						&& currentColTwo < grid[0].length - 1
+						&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
+						&& grid[currentRowTwo][currentColTwo + 1] != CRATE
+						&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
+						&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
+				{
+					currentColTwo++;
+					playerTwoImg = 6;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_UP
+						&& currentRowTwo > 0
+						&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
+						&& grid[currentRowTwo - 1][currentColTwo] != CRATE
+						&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
+						&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
+				{
+					currentRowTwo--;
+					playerTwoImg = 5;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_DOWN
+						&& currentRowTwo < grid.length - 1
+						&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
+						&& grid[currentRowTwo + 1][currentColTwo] != CRATE
+						&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
+						&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
+				{
+					currentRowTwo++;
+					playerTwoImg = 7;
+				}
+				else if (event.getKeyCode() == KeyEvent.VK_SLASH)
+				{
+					placeCan(playerTwo, currentRowTwo, currentColTwo);
+				}
 
-			if (grid[currentRowTwo][currentColTwo] == TIRE ||
-					grid[currentRowTwo][currentColTwo] == MENTOS ||
-					grid[currentRowTwo][currentColTwo] == CAN)
-			{
-				playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
-				grid[currentRowTwo][currentColTwo] = EMPTY;
+				if (grid[currentRowTwo][currentColTwo] == TIRE ||
+						grid[currentRowTwo][currentColTwo] == MENTOS ||
+						grid[currentRowTwo][currentColTwo] == CAN)
+				{
+					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
+					grid[currentRowTwo][currentColTwo] = EMPTY;
+				}
+				// Repaints the screen after the changes
+				repaint();
 			}
-			// Repaints the screen after the changes
-			repaint();
 		}
 	}
 
@@ -740,12 +768,6 @@ public class SodasplosionGrid extends JPanel
 		else if (menu == START_MENU)
 		{
 			g.drawImage(startMenu, 0, 0, this);
-
-			if (!canPlay())
-			{
-				g.setFont(font);
-				g.drawString("PLEASE SELECT GAME SETTINGS", 430, 515);
-			}
 
 			// Draws a white rectangle around the setting that has been selected
 			if (noOfPlayers == 1)
