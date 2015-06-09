@@ -53,7 +53,7 @@ public class SodasplosionGrid extends JPanel
 	private Timer timer;
 
 	// Game option
-	private Font font = new Font("Serif", Font.BOLD, 12);
+	private Font font = new Font("Serif", Font.BOLD, 32);
 	private int menu = MAIN_MENU;
 	private int noOfPlayers = 2;
 	private int noOfRounds = 1;
@@ -123,7 +123,7 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		// Sets up the timer for the explosion
-		timer = new Timer(1000, null);
+		timer = new Timer(100, null);
 		timer.start();
 
 		// Set the image height and width based on the path image size
@@ -268,17 +268,23 @@ public class SodasplosionGrid extends JPanel
 		public void actionPerformed(ActionEvent event)
 		{
 			counter++;
-			if (counter == 3)
+			
+			if (counter == 30)
 			{
-				grid[canRow][canCol] = EXPLOSION;
-				checkCollision(canRow, canCol, player);
+				if (grid[canRow][canCol] == REDCAN
+						|| grid[canRow][canCol] ==	BLUECAN)
+				{
+					grid[canRow][canCol] = EXPLOSION;
+					checkCollision(canRow, canCol, player);
+				}
 			}
-			else if (counter == 4)
+			else if (counter == 35)
 			{
 				clearExplosions(canRow, canCol, range);
 				player.returnCan();
 				timer.removeActionListener(this);
 			}
+
 			repaint();
 		}
 	}
@@ -329,16 +335,16 @@ public class SodasplosionGrid extends JPanel
 
 			if (currentRowOne == canRow - upPos && currentColOne == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerOne.loseLife();
+				if (playerOne.getNoOfLives() < 1)
 				{
 					System.out.println("Player One Loses");
 				}
 			}
 			if (currentRowTwo == canRow - upPos && currentColTwo == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerTwo.loseLife();
+				if (playerTwo.getNoOfLives() < 1)
 				{
 					System.out.println("Player Two Loses");
 				}
@@ -380,16 +386,16 @@ public class SodasplosionGrid extends JPanel
 
 			if (currentRowOne == canRow + downPos && currentColOne == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerOne.loseLife();
+				if (playerOne.getNoOfLives() < 1)
 				{
 					System.out.println("Player One Loses");
 				}
 			}
 			if (currentRowTwo == canRow + downPos && currentColTwo == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerTwo.loseLife();
+				if (playerTwo.getNoOfLives() < 1)
 				{
 					System.out.println("Player Two Loses");
 				}
@@ -431,16 +437,16 @@ public class SodasplosionGrid extends JPanel
 
 			if (currentRowOne == canRow && currentColOne - leftPos == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerOne.loseLife();
+				if (playerOne.getNoOfLives() < 1)
 				{
 					System.out.println("Player One Loses");
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo - leftPos == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerTwo.loseLife();
+				if (playerTwo.getNoOfLives() < 1)
 				{
 					System.out.println("Player Two Loses");
 				}
@@ -482,16 +488,16 @@ public class SodasplosionGrid extends JPanel
 
 			if (currentRowOne == canRow && currentColOne + rightPos == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerOne.loseLife();
+				if (playerOne.getNoOfLives() < 1)
 				{
 					System.out.println("Player One Loses");
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo + rightPos == canCol)
 			{
-				player.loseLife();
-				if (player.getNoOfLives() < 1)
+				playerTwo.loseLife();
+				if (playerTwo.getNoOfLives() < 1)
 				{
 					System.out.println("Player Two Loses");
 				}
@@ -508,36 +514,14 @@ public class SodasplosionGrid extends JPanel
 	 */
 	public void clearExplosions(int canRow, int canCol, int range)
 	{
-		grid[canRow][canCol] = EMPTY;
-
-		for (int upPos = 1; canRow - upPos >= 0 && upPos <= range; upPos++)
+		for (int row = 0; row < grid.length; row++)
 		{
-			if (grid[canRow - upPos][canCol] == EXPLOSION)
+			for (int col = 0; col < grid[0].length; col++)
 			{
-				grid[canRow - upPos][canCol] = EMPTY;
-			}
-		}
-		for (int downPos = 1; canRow + downPos < grid.length
-				&& downPos <= range; downPos++)
-		{
-			if (grid[canRow + downPos][canCol] == EXPLOSION)
-			{
-				grid[canRow + downPos][canCol] = EMPTY;
-			}
-		}
-		for (int leftPos = 1; canCol - leftPos >= 0 && leftPos <= range; leftPos++)
-		{
-			if (grid[canRow][canCol - leftPos] == EXPLOSION)
-			{
-				grid[canRow][canCol - leftPos] = EMPTY;
-			}
-		}
-		for (int rightPos = 1; canCol + rightPos < grid[0].length
-				&& rightPos <= range; rightPos++)
-		{
-			if (grid[canRow][canCol + rightPos] == EXPLOSION)
-			{
-				grid[canRow][canCol + rightPos] = EMPTY;
+				if (grid[row][col] == EXPLOSION)
+				{
+					grid[row][col] = EMPTY;
+				}
 			}
 		}
 	}
@@ -717,7 +701,7 @@ public class SodasplosionGrid extends JPanel
 					currentRowOne++;
 					playerOneImg = 3;
 				}
-				else if (event.getKeyCode() == KeyEvent.VK_Q)
+				else if (event.getKeyCode() == KeyEvent.VK_Q || event.getKeyCode() == KeyEvent.VK_G)
 				{
 					placeCan(playerOne, currentRowOne, currentColOne);
 				}
@@ -770,7 +754,7 @@ public class SodasplosionGrid extends JPanel
 					currentRowTwo++;
 					playerTwoImg = 7;
 				}
-				else if (event.getKeyCode() == KeyEvent.VK_SLASH)
+				else if (event.getKeyCode() == KeyEvent.VK_SLASH || event.getKeyCode() == KeyEvent.VK_NUMPAD0)
 				{
 					placeCan(playerTwo, currentRowTwo, currentColTwo);
 				}
@@ -781,6 +765,11 @@ public class SodasplosionGrid extends JPanel
 				{
 					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
 					grid[currentRowTwo][currentColTwo] = EMPTY;
+				}
+				
+				if (event.getKeyCode() == KeyEvent.VK_N)
+				{
+					newGame();
 				}
 				// Repaints the screen after the changes
 				repaint();
@@ -796,6 +785,7 @@ public class SodasplosionGrid extends JPanel
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
+		g.setFont(font);
 		g.setColor(Color.WHITE);
 
 		// Redraws the grid with current images and draws the players on top of
@@ -803,6 +793,8 @@ public class SodasplosionGrid extends JPanel
 		// Draws a menu screen if one of the menus are selected
 		if (menu == GAME)
 		{
+			g.setColor(Color.BLACK);
+			
 			g.drawImage(border, 128, 0, this);
 			g.drawImage(sidebar, 0, 0, this);
 
@@ -813,13 +805,21 @@ public class SodasplosionGrid extends JPanel
 					g.drawImage(gridImages[grid[row][column]], column
 							* IMAGE_WIDTH + 160, row * IMAGE_HEIGHT + 32, this);
 				}
-			}
-
+			}		
+			
 			g.drawImage(playerImages[playerOneImg], currentColOne * IMAGE_WIDTH
 					+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
+			
+			g.drawString("" + playerOne.getNoOfLives(), 70, 262);
+			g.drawString("" + playerOne.getTotalCans(), 70, 300);
+			g.drawString("" + playerOne.getRange(), 70, 338);
 
 			g.drawImage(playerImages[playerTwoImg], currentColTwo * IMAGE_WIDTH
 					+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
+			
+			g.drawString("" + playerTwo.getNoOfLives(), 70, 492);
+			g.drawString("" + playerTwo.getTotalCans(), 70, 530);
+			g.drawString("" + playerTwo.getRange(), 70, 568);
 		}
 		else if (menu == MAIN_MENU)
 		{
