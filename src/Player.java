@@ -7,7 +7,7 @@
 public class Player
 {
 	private int[] powerUps;
-	private int currentCans, noOfLives, noOfWins;
+	private int currentCans, noOfWins;
 
 	/**
 	 * Constructs a player object, starting all power ups at 1
@@ -24,6 +24,7 @@ public class Player
 		powerUps[2] = 1;
 		powerUps[3] = 1;
 		currentCans = 1;
+		noOfWins = 1;
 	}
 
 	/**
@@ -107,6 +108,9 @@ public class Player
 		currentCans++;
 	}
 	
+	/**
+	 * Adds one to the given player's number of wins
+	 */
 	public void winRound()
 	{
 		noOfWins++;
