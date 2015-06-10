@@ -19,6 +19,7 @@ public class SodasplosionMain extends JFrame
 		// Set up the frame and the grid
 		super();
 		setResizable(false);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("img/Sodasplosion.png"));
 		sodasplosionGrid = new SodasplosionGrid();
 		add(new SodasplosionGrid(), BorderLayout.CENTER);
 	}

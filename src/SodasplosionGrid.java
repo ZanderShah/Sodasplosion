@@ -67,7 +67,9 @@ public class SodasplosionGrid extends JPanel
 	private Image playerImages[];
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
-	private Timer timer;
+	
+	// Timers
+	private Timer explosions;
 
 	// Game option
 	private Font standardFont = new Font("Apple LiGothic", Font.BOLD, 32);
@@ -145,8 +147,6 @@ public class SodasplosionGrid extends JPanel
 		boom = Applet.newAudioClip(getCompleteURL("sound/boom.wav"));
 		collision = Applet.newAudioClip(getCompleteURL("sound/collision.wav"));
 		
-		
-		
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
 		{
@@ -155,8 +155,8 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		// Sets up the timer for the explosion
-		timer = new Timer(100, null);
-		timer.start();
+		explosions = new Timer(100, null);
+		explosions.start();
 
 		// Set the image height and width based on the path image size
 		// Also sizes this panel based on the image and grid size
@@ -273,7 +273,7 @@ public class SodasplosionGrid extends JPanel
 				grid[row][col] = BLUECAN;
 			}
 
-			timer.addActionListener(new Sodasplosion(player, player.getRange(),
+			explosions.addActionListener(new Sodasplosion(player, player.getRange(),
 					row, col));
 		}
 	}
@@ -327,7 +327,7 @@ public class SodasplosionGrid extends JPanel
 			{
 				clearExplosions(canRow, canCol, range);
 				player.returnCan();
-				timer.removeActionListener(this);
+				explosions.removeActionListener(this);
 			}
 
 			repaint();
