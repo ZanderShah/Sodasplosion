@@ -45,7 +45,6 @@ public class SodasplosionGrid extends JPanel
 	private final int PLAYER_TWO = -1;
 
 	// Program variables
-
 	private boolean gameOver;
 	private boolean roundOver;
 
@@ -68,7 +67,7 @@ public class SodasplosionGrid extends JPanel
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
 	private Timer timer;
-
+	
 	// Game option
 	private Font standardFont = new Font("Apple LiGothic", Font.BOLD, 32);
 	private Font largeFont = new Font("Apple LiGothic", Font.BOLD, 48);
@@ -349,7 +348,7 @@ public class SodasplosionGrid extends JPanel
 		
 		// Collision code for the upwards direction
 		boolean alreadyHitSomething = false;
-		for (int upPos = 1; upPos <= range
+		for (int upPos = 0; upPos <= range
 				&& canRow - upPos >= 0
 				&& grid[canRow - upPos][canCol] != BUILDING
 				&& !alreadyHitSomething; upPos++)
@@ -775,7 +774,15 @@ public class SodasplosionGrid extends JPanel
 			repaint();
 		}
 	}
-
+	
+	/**
+	 * 
+	 */
+	private void computerPlayer()
+	{
+		
+	}
+	
 	/**
 	 * Inner class to deal with key presses
 	 *
@@ -981,13 +988,13 @@ public class SodasplosionGrid extends JPanel
 					
 					if (playerOne.getNoOfWins() == totalWins)
 					{
-						g.drawImage(playerImages[1], 535, 330, this);
-						g.drawString("Player One Wins the Game!", 290, 175);
+						g.drawImage(playerImages[1], 534, 330, this);
+						g.drawString("Player One Wins the Game!", 277, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[5], 535, 330, this);
-						g.drawString("Player Two Wins the Game!", 290, 175);
+						g.drawImage(playerImages[5], 534, 330, this);
+						g.drawString("Player Two Wins the Game!", 277, 175);
 					}
 				}
 				else
@@ -996,17 +1003,16 @@ public class SodasplosionGrid extends JPanel
 
 					if (roundWinner == PLAYER_ONE)
 					{
-						g.drawImage(playerImages[1], 542, 335, this);
-						g.drawString("Player One Wins Round!", 325, 175);
+						g.drawImage(playerImages[1], 539, 338, this);
+						g.drawString("Player One Wins Round!", 312, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[5], 542, 335, this);
-						g.drawString("Player Two Wins Round!", 325, 175);
+						g.drawImage(playerImages[5], 539, 338, this);
+						g.drawString("Player Two Wins Round!", 312, 175);
 					}
-					
-					g.drawString("Click anywhere on the", 300, 600);
-					g.drawString("screen to continue ...", 300, 650);
+					g.setFont(standardFont);
+					g.drawString("Click anywhere to continue", 370, 600);
 				}	
 			}
 		}
