@@ -24,7 +24,7 @@ public class Player
 		powerUps[2] = 1;
 		powerUps[3] = 1;
 		currentCans = 1;
-		noOfWins = 1;
+		noOfWins = 0;
 	}
 
 	/**
@@ -47,8 +47,8 @@ public class Player
 			}
 			else if (type == 1 && powerUps[type] < 3)
 			{
-				powerUps[type]++;	
-			}	
+				powerUps[type]++;
+			}
 		}
 	}
 
@@ -69,7 +69,7 @@ public class Player
 	{
 		powerUps[1]--;
 	}
-	
+
 	/**
 	 * Gets the given player's blast range
 	 * 
@@ -115,7 +115,7 @@ public class Player
 	{
 		currentCans++;
 	}
-	
+
 	/**
 	 * Adds one to the given player's number of wins
 	 */
@@ -123,7 +123,7 @@ public class Player
 	{
 		noOfWins++;
 	}
-	
+
 	/**
 	 * Gets the given player's number of wins
 	 * 
@@ -132,5 +132,25 @@ public class Player
 	public int getNoOfWins()
 	{
 		return noOfWins;
+	}
+
+	/**
+	 * Resets all the power levels for the given player 
+	 * to prepare for a new round or game
+	 */
+	public void resetPower()
+	{
+		powerUps[1] = 1;
+		powerUps[2] = 1;
+		powerUps[3] = 1;
+		currentCans = 1;
+	}
+	
+	/**
+	 * Resets the number of wins to prepare for a new game
+	 */
+	public void resetWins()
+	{
+		noOfWins = 0;
 	}
 }

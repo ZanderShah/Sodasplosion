@@ -29,24 +29,33 @@ public class SodasplosionGrid extends JPanel
 
 	// Menu
 	private final int GAME = -1;
+	private final int ROUND = 0;
 	private final int MAIN_MENU = 1;
 	private final int START_MENU = 2;
 	private final int STORY = 3;
 	private final int INSTRUCTIONS_1 = 4;
 	private final int INSTRUCTIONS_2 = 5;
 
+	// Player
+	private final int PLAYER_ONE = 1;
+	private final int PLAYER_TWO = -1;
+
 	// Program variables
+
+	private boolean gameOver;
+	private boolean roundOver;
 
 	// Grid
 	private int[][] grid;
 	private Image border;
 	private Image gridImages[];
-	
-	//In-game interface
+
+	// In-game interface
 	private Image sidebar;
 	private Image roundWin;
+	private int roundWinner;
 	private Image gameWin;
-	
+
 	// Player
 	private Player playerOne = new Player();
 	private Player playerTwo = new Player();
@@ -57,13 +66,14 @@ public class SodasplosionGrid extends JPanel
 	private Timer timer;
 
 	// Game option
-	private Font font = new Font("Apple LiGothic", Font.BOLD, 32);
+	private Font standardFont = new Font("Apple LiGothic", Font.BOLD, 32);
+	private Font largeFont = new Font("Apple LiGothic", Font.BOLD, 48);
 	private int menu = MAIN_MENU;
 	private int noOfPlayers = 2;
-	private int noOfRounds = 1;
+	private int totalWins = 1;
 	private int mapType = 1;
 
-	//Rectangles for in-game sidebar
+	// Rectangles for in-game sidebar
 	private Rectangle IN_GAME_BACK = new Rectangle(15, 631, 100, 70);
 	private Rectangle EXIT_BUTTON = new Rectangle(15, 711, 100, 45);
 
@@ -78,7 +88,7 @@ public class SodasplosionGrid extends JPanel
 	private Rectangle CLASSIC = new Rectangle(560, 73, 150, 150);
 	private Rectangle SHOWDOWN = new Rectangle(787, 73, 150, 150);
 	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
-	private Rectangle[] NO_OF_ROUNDS = new Rectangle[10];
+	private Rectangle[] TOTAL_WINS = new Rectangle[10];
 
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
@@ -121,12 +131,11 @@ public class SodasplosionGrid extends JPanel
 		story = new ImageIcon("img/Story.png").getImage();
 		roundWin = new ImageIcon("img/RoundWin.png").getImage();
 		gameWin = new ImageIcon("img/GameWin.png").getImage();
-		
 
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
 		{
-			NO_OF_ROUNDS[round] = new Rectangle(82 + 100 * (round - 1),
+			TOTAL_WINS[round] = new Rectangle(82 + 100 * (round - 1),
 					408, 60, 60);
 		}
 
@@ -152,8 +161,20 @@ public class SodasplosionGrid extends JPanel
 	/**
 	 * Resets the grid to prepare for a new game
 	 */
-	public void newGame()
+	public void resetGame(int roundOrGame)
 	{
+		playerOne.resetPower();
+		playerTwo.resetPower();
+
+		roundOver = false;
+		gameOver = false;
+		
+		if (roundOrGame == GAME)
+		{
+			playerOne.resetWins();
+			playerTwo.resetWins();
+		}
+
 		// Declares number of rows and number of columns and sets up an array to
 		// keep track of the grid
 		int noOfRows = 11;
@@ -211,7 +232,7 @@ public class SodasplosionGrid extends JPanel
 
 	/**
 	 * Checks to see if the given player can place a can and if so, starts the
-	 * sodasplosion timer
+	 * explosion timer
 	 * 
 	 * @param player the given player
 	 * @param row the row of the given player
@@ -276,11 +297,11 @@ public class SodasplosionGrid extends JPanel
 		public void actionPerformed(ActionEvent event)
 		{
 			counter++;
-			
+
 			if (counter == 30)
 			{
 				if (grid[canRow][canCol] == REDCAN
-						|| grid[canRow][canCol] ==	BLUECAN)
+						|| grid[canRow][canCol] == BLUECAN)
 				{
 					grid[canRow][canCol] = EXPLOSION;
 					checkCollision(canRow, canCol, player);
@@ -346,7 +367,9 @@ public class SodasplosionGrid extends JPanel
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
 				{
-					System.out.println("Player One Loses");
+					playerTwo.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_TWO;
 				}
 			}
 			if (currentRowTwo == canRow - upPos && currentColTwo == canCol)
@@ -354,7 +377,9 @@ public class SodasplosionGrid extends JPanel
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
 				{
-					System.out.println("Player Two Loses");
+					playerOne.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_ONE;
 				}
 			}
 		}
@@ -397,7 +422,9 @@ public class SodasplosionGrid extends JPanel
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
 				{
-					System.out.println("Player One Loses");
+					playerTwo.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_TWO;
 				}
 			}
 			if (currentRowTwo == canRow + downPos && currentColTwo == canCol)
@@ -405,7 +432,9 @@ public class SodasplosionGrid extends JPanel
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
 				{
-					System.out.println("Player Two Loses");
+					playerOne.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_ONE;
 				}
 			}
 		}
@@ -448,7 +477,9 @@ public class SodasplosionGrid extends JPanel
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
 				{
-					System.out.println("Player One Loses");
+					playerTwo.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_TWO;
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo - leftPos == canCol)
@@ -456,7 +487,9 @@ public class SodasplosionGrid extends JPanel
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
 				{
-					System.out.println("Player Two Loses");
+					playerOne.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_ONE;
 				}
 			}
 		}
@@ -499,7 +532,9 @@ public class SodasplosionGrid extends JPanel
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
 				{
-					System.out.println("Player One Loses");
+					playerTwo.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_TWO;
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo + rightPos == canCol)
@@ -507,7 +542,9 @@ public class SodasplosionGrid extends JPanel
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
 				{
-					System.out.println("Player Two Loses");
+					playerOne.winRound();
+					roundOver = true;
+					roundWinner = PLAYER_ONE;
 				}
 			}
 		}
@@ -553,19 +590,24 @@ public class SodasplosionGrid extends JPanel
 			Point pressed = event.getPoint();
 
 			// Check menu the screen is currently on
-			if (menu != MAIN_MENU )
+			if (menu != MAIN_MENU)
 			{
-		
-				// Go to main menu if back to main menu button is pressed at a menu
+
+				// Go to main menu if back to main menu button is pressed at a
+				// menu
 				if (BACK_MENU_BUTTON.contains(pressed) && menu != GAME)
 				{
 					menu = MAIN_MENU;
 				}
 
-				//Respond if the back to menu button or exit button in game 
-				//have been pressed
+				// Respond if the back to menu button or exit button in game
+				// have been pressed
 				if (menu == GAME)
 				{
+					if (roundOver && !gameOver)
+					{
+						resetGame(ROUND);
+					}
 					if (IN_GAME_BACK.contains(pressed))
 					{
 						menu = MAIN_MENU;
@@ -575,7 +617,7 @@ public class SodasplosionGrid extends JPanel
 						System.exit(0);
 					}
 				}
-				
+
 				// When on the start menu, set game variables based buttons
 				// clicked on mouse
 				else if (menu == START_MENU)
@@ -601,11 +643,11 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						for (int round = 1; round <= 9; round++)
+						for (int noOfWins = 1; noOfWins <= 9; noOfWins++)
 						{
-							if (NO_OF_ROUNDS[round].contains(pressed))
+							if (TOTAL_WINS[noOfWins].contains(pressed))
 							{
-								noOfRounds = round;
+								totalWins = noOfWins;
 							}
 						}
 					}
@@ -616,7 +658,7 @@ public class SodasplosionGrid extends JPanel
 					if (PLAY_BUTTON.contains(pressed))
 					{
 						menu = GAME;
-						newGame();
+						resetGame(GAME);
 					}
 				}
 				// Allow user to change pages between the instruction menus
@@ -724,7 +766,8 @@ public class SodasplosionGrid extends JPanel
 					currentRowOne++;
 					playerOneImg = 3;
 				}
-				else if (event.getKeyCode() == KeyEvent.VK_Q || event.getKeyCode() == KeyEvent.VK_G)
+				else if (event.getKeyCode() == KeyEvent.VK_Q
+						|| event.getKeyCode() == KeyEvent.VK_G)
 				{
 					placeCan(playerOne, currentRowOne, currentColOne);
 				}
@@ -777,7 +820,8 @@ public class SodasplosionGrid extends JPanel
 					currentRowTwo++;
 					playerTwoImg = 7;
 				}
-				else if (event.getKeyCode() == KeyEvent.VK_SLASH || event.getKeyCode() == KeyEvent.VK_NUMPAD0)
+				else if (event.getKeyCode() == KeyEvent.VK_SLASH
+						|| event.getKeyCode() == KeyEvent.VK_NUMPAD0)
 				{
 					placeCan(playerTwo, currentRowTwo, currentColTwo);
 				}
@@ -788,11 +832,6 @@ public class SodasplosionGrid extends JPanel
 				{
 					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
 					grid[currentRowTwo][currentColTwo] = EMPTY;
-				}
-				
-				if (event.getKeyCode() == KeyEvent.VK_N)
-				{
-					newGame();
 				}
 				// Repaints the screen after the changes
 				repaint();
@@ -808,7 +847,7 @@ public class SodasplosionGrid extends JPanel
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
-		g.setFont(font);
+		g.setFont(standardFont);
 		g.setColor(Color.WHITE);
 
 		// Redraws the grid with current images and draws the players on top of
@@ -819,30 +858,76 @@ public class SodasplosionGrid extends JPanel
 			g.drawImage(border, 128, 0, this);
 			g.drawImage(sidebar, 0, 0, this);
 
-			for (int row = 0; row < grid.length; row++)
-			{
-				for (int column = 0; column < grid[0].length; column++)
-				{
-					g.drawImage(gridImages[grid[row][column]], column
-							* IMAGE_WIDTH + 160, row * IMAGE_HEIGHT + 32, this);
-				}
-			}		
-			
-			g.drawImage(playerImages[playerOneImg], currentColOne * IMAGE_WIDTH
-					+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
-			
 			g.drawString("" + playerOne.getNoOfLives(), 70, 254);
 			g.drawString("" + playerOne.getTotalCans(), 70, 291);
 			g.drawString("" + playerOne.getRange(), 70, 330);
 			g.drawString("" + playerOne.getNoOfWins(), 70, 370);
 
-			g.drawImage(playerImages[playerTwoImg], currentColTwo * IMAGE_WIDTH
-					+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
-			
 			g.drawString("" + playerTwo.getNoOfLives(), 70, 490);
 			g.drawString("" + playerTwo.getTotalCans(), 70, 528);
 			g.drawString("" + playerTwo.getRange(), 70, 565);
 			g.drawString("" + playerTwo.getNoOfWins(), 70, 605);
+
+			if (!roundOver)
+			{
+				for (int row = 0; row < grid.length; row++)
+				{
+					for (int column = 0; column < grid[0].length; column++)
+					{
+						g.drawImage(gridImages[grid[row][column]], column
+								* IMAGE_WIDTH + 160, row * IMAGE_HEIGHT + 32,
+								this);
+					}
+				}
+
+				g.drawImage(playerImages[playerOneImg], currentColOne
+						* IMAGE_WIDTH
+						+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
+
+				g.drawImage(playerImages[playerTwoImg], currentColTwo
+						* IMAGE_WIDTH
+						+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
+			}
+			else
+			{
+				g.setFont(largeFont);
+
+				if (playerOne.getNoOfWins() == totalWins || playerTwo.getNoOfWins() == totalWins)
+				{
+					gameOver = true;
+					
+					g.drawImage(gameWin, 326, 204, this);
+					
+					if (playerOne.getNoOfWins() == totalWins)
+					{
+						g.drawImage(playerImages[1], 544, 352, this);
+						g.drawString("Player One Wins the Game!", 325, 175);
+					}
+					else
+					{
+						g.drawImage(playerImages[6], 544, 352, this);
+						g.drawString("Player Two Wins the Game!", 325, 175);
+					}
+				}
+				else
+				{
+					g.drawImage(roundWin, 326, 204, this);
+
+					if (roundWinner == PLAYER_ONE)
+					{
+						g.drawImage(playerImages[1], 544, 352, this);
+						g.drawString("Player One Wins Round!", 325, 175);
+					}
+					else
+					{
+						g.drawImage(playerImages[6], 544, 352, this);
+						g.drawString("Player Two Wins Round!", 325, 175);
+					}
+					
+					g.drawString("Click anywhere on the", 300, 600);
+					g.drawString("screen to continue ...", 300, 650);
+				}	
+			}
 		}
 		else if (menu == MAIN_MENU)
 		{
@@ -871,9 +956,9 @@ public class SodasplosionGrid extends JPanel
 				g.drawRect(782, 68, 160, 160);
 			}
 
-			if (noOfRounds > 0)
+			if (totalWins > 0)
 			{
-				g.drawRect(100 * (noOfRounds - 1) + 77, 403, 70, 70);
+				g.drawRect(100 * (totalWins - 1) + 77, 403, 70, 70);
 			}
 		}
 		else if (menu == STORY)
