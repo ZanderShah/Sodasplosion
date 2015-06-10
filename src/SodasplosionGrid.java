@@ -279,7 +279,7 @@ public class SodasplosionGrid extends JPanel
 					checkCollision(canRow, canCol, player);
 				}
 			}
-			else if (counter == 35)
+			else if (counter == 33)
 			{
 				clearExplosions(canRow, canCol, range);
 				player.returnCan();
