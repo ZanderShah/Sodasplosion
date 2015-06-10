@@ -809,9 +809,7 @@ public class SodasplosionGrid extends JPanel
 		// the grid if the game is selected
 		// Draws a menu screen if one of the menus are selected
 		if (menu == GAME)
-		{
-			g.setColor(Color.BLACK);
-			
+		{		
 			g.drawImage(border, 128, 0, this);
 			g.drawImage(sidebar, 0, 0, this);
 
