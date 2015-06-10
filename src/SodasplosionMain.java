@@ -26,6 +26,7 @@ public class SodasplosionMain extends JFrame
 
 	/**
 	 * Starts up the SodaSplosionMain frame
+	 * 
 	 * @param args An array of Strings (ignored)
 	 */
 	public static void main(String[] args)
@@ -34,6 +35,7 @@ public class SodasplosionMain extends JFrame
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setUndecorated(true);
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 }
