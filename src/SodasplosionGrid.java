@@ -937,7 +937,7 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 535, 330, this);
+						g.drawImage(playerImages[5], 535, 330, this);
 						g.drawString("Player Two Wins the Game!", 325, 175);
 					}
 				}
@@ -952,7 +952,7 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 540, 335, this);
+						g.drawImage(playerImages[5], 540, 335, this);
 						g.drawString("Player Two Wins Round!", 325, 175);
 					}
 					
