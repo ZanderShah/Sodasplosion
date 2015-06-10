@@ -286,7 +286,7 @@ public class SodasplosionGrid extends JPanel
 					checkCollision(canRow, canCol, player);
 				}
 			}
-			else if (counter == 35)
+			else if (counter == 33)
 			{
 				clearExplosions(canRow, canCol, range);
 				player.returnCan();
@@ -816,8 +816,6 @@ public class SodasplosionGrid extends JPanel
 		// Draws a menu screen if one of the menus are selected
 		if (menu == GAME)
 		{
-			g.setColor(Color.WHITE);
-			
 			g.drawImage(border, 128, 0, this);
 			g.drawImage(sidebar, 0, 0, this);
 
