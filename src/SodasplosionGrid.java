@@ -372,6 +372,8 @@ public class SodasplosionGrid extends JPanel
 					roundWinner = PLAYER_TWO;
 					currentRowOne = -1;
 					currentColOne = -1;
+					currentRowTwo = -1;
+					currentColTwo = -1;
 				}
 			}
 			if (currentRowTwo == canRow - upPos && currentColTwo == canCol)
@@ -382,6 +384,8 @@ public class SodasplosionGrid extends JPanel
 					playerOne.winRound();
 					roundOver = true;
 					roundWinner = PLAYER_ONE;
+					currentRowOne = -1;
+					currentColOne = -1;
 					currentRowTwo = -1;
 					currentColTwo = -1;
 				}
@@ -431,6 +435,8 @@ public class SodasplosionGrid extends JPanel
 					roundWinner = PLAYER_TWO;
 					currentRowOne = -1;
 					currentColOne = -1;
+					currentRowTwo = -1;
+					currentColTwo = -1;
 				}
 			}
 			if (currentRowTwo == canRow + downPos && currentColTwo == canCol)
@@ -441,6 +447,8 @@ public class SodasplosionGrid extends JPanel
 					playerOne.winRound();
 					roundOver = true;
 					roundWinner = PLAYER_ONE;
+					currentRowOne = -1;
+					currentColOne = -1;
 					currentRowTwo = -1;
 					currentColTwo = -1;
 				}
@@ -490,6 +498,8 @@ public class SodasplosionGrid extends JPanel
 					roundWinner = PLAYER_TWO;
 					currentRowOne = -1;
 					currentColOne = -1;
+					currentRowTwo = -1;
+					currentColTwo = -1;
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo - leftPos == canCol)
@@ -500,6 +510,8 @@ public class SodasplosionGrid extends JPanel
 					playerOne.winRound();
 					roundOver = true;
 					roundWinner = PLAYER_ONE;
+					currentRowOne = -1;
+					currentColOne = -1;
 					currentRowTwo = -1;
 					currentColTwo = -1;
 				}
@@ -549,6 +561,8 @@ public class SodasplosionGrid extends JPanel
 					roundWinner = PLAYER_TWO;
 					currentRowOne = -1;
 					currentColOne = -1;
+					currentRowTwo = -1;
+					currentColTwo = -1;
 				}
 			}
 			if (currentRowTwo == canRow && currentColTwo + rightPos == canCol)
@@ -559,6 +573,8 @@ public class SodasplosionGrid extends JPanel
 					playerOne.winRound();
 					roundOver = true;
 					roundWinner = PLAYER_ONE;
+					currentRowOne = -1;
+					currentColOne = -1;
 					currentRowTwo = -1;
 					currentColTwo = -1;
 				}
