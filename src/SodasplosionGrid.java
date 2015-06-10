@@ -62,7 +62,8 @@ public class SodasplosionGrid extends JPanel
 	private int mapType = 1;
 
 	//Rectangles for in-game sidebar
-	//private Rectangle IN_GAME_BACK = new Rectangle() 
+	private Rectangle IN_GAME_BACK = new Rectangle(15, 631, 100, 70);
+	private Rectangle EXIT_BUTTON = new Rectangle(15, 711, 100, 45);
 	
 	// Rectangles for the menu screens
 	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
@@ -481,17 +482,33 @@ public class SodasplosionGrid extends JPanel
 			Point pressed = event.getPoint();
 
 			// Check menu the screen is currently on
-			if (menu != MAIN_MENU)
+			if (menu != MAIN_MENU )
 			{
-				// Go to main menu if back to main menu button is pressed
-				if (BACK_MENU_BUTTON.contains(pressed))
+				
+				
+				// Go to main menu if back to main menu button is pressed at a menu
+				if (BACK_MENU_BUTTON.contains(pressed) && menu != GAME)
 				{
 					menu = MAIN_MENU;
 				}
 
+				//Respond if the back to menu button or exit button in game 
+				//have been pressed
+				if (menu == GAME)
+				{
+					if (IN_GAME_BACK.contains(pressed))
+					{
+						menu = MAIN_MENU;
+					}
+					else if (EXIT_BUTTON.contains(pressed))
+					{
+						System.exit(0);
+					}
+				}
+				
 				// When on the start menu, set game variables based buttons
 				// clicked on mouse
-				if (menu == START_MENU)
+				else if (menu == START_MENU)
 				{
 					// Respond if any of the buttons on the start screen were
 					// pressed
