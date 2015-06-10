@@ -1,5 +1,7 @@
 import java.awt.*;
+
 import javax.swing.*;
+
 import java.awt.event.*;
 import java.net.*;
 import java.applet.*;
@@ -94,6 +96,9 @@ public class SodasplosionGrid extends JPanel
 
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
+	
+	// Sound
+	private AudioClip intro, storyline, howToPlay, boom, collision;
 
 	/**
 	 * Constructs a new grid
@@ -134,6 +139,14 @@ public class SodasplosionGrid extends JPanel
 		roundWin = new ImageIcon("img/RoundWin.png").getImage();
 		gameWin = new ImageIcon("img/GameWin.png").getImage();
 
+		intro = Applet.newAudioClip(getCompleteURL("sound/intro.wav"));
+		storyline = Applet.newAudioClip(getCompleteURL("sound/story.wav"));
+		howToPlay = Applet.newAudioClip(getCompleteURL("sound/howToPlay.wav"));
+		boom = Applet.newAudioClip(getCompleteURL("sound/boom.wav"));
+		collision = Applet.newAudioClip(getCompleteURL("sound/collision.wav"));
+		
+		
+		
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
 		{
@@ -330,8 +343,10 @@ public class SodasplosionGrid extends JPanel
 	 */
 	public void checkCollision(int canRow, int canCol, Player player)
 	{
+		boom.play();
+		
 		int range = player.getRange();
-
+		
 		// Collision code for the upwards direction
 		boolean alreadyHitSomething = false;
 		for (int upPos = 1; upPos <= range
@@ -368,6 +383,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowOne == canRow - upPos && currentColOne == canCol)
 			{
 				playerOne.loseLife();
+				collision.play();
 				if (playerOne.getNoOfLives() < 1)
 				{
 					playerTwo.winRound();
@@ -382,6 +398,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowTwo == canRow - upPos && currentColTwo == canCol)
 			{
 				playerTwo.loseLife();
+				collision.play();
 				if (playerTwo.getNoOfLives() < 1)
 				{
 					playerOne.winRound();
@@ -431,6 +448,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowOne == canRow + downPos && currentColOne == canCol)
 			{
 				playerOne.loseLife();
+				collision.play();
 				if (playerOne.getNoOfLives() < 1)
 				{
 					playerTwo.winRound();
@@ -445,6 +463,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowTwo == canRow + downPos && currentColTwo == canCol)
 			{
 				playerTwo.loseLife();
+				collision.play();
 				if (playerTwo.getNoOfLives() < 1)
 				{
 					playerOne.winRound();
@@ -494,6 +513,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowOne == canRow && currentColOne == canCol - leftPos)
 			{
 				playerOne.loseLife();
+				collision.play();
 				if (playerOne.getNoOfLives() < 1)
 				{
 					playerTwo.winRound();
@@ -508,6 +528,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowTwo == canRow && currentColTwo == canCol - leftPos)
 			{
 				playerTwo.loseLife();
+				collision.play();
 				if (playerTwo.getNoOfLives() < 1)
 				{
 					playerOne.winRound();
@@ -557,6 +578,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowOne == canRow && currentColOne == canCol + rightPos)
 			{
 				playerOne.loseLife();
+				collision.play();
 				if (playerOne.getNoOfLives() < 1)
 				{
 					playerTwo.winRound();
@@ -571,6 +593,7 @@ public class SodasplosionGrid extends JPanel
 			if (currentRowTwo == canRow && currentColTwo == canCol + rightPos)
 			{
 				playerTwo.loseLife();
+				collision.play();
 				if (playerTwo.getNoOfLives() < 1)
 				{
 					playerOne.winRound();
@@ -732,17 +755,20 @@ public class SodasplosionGrid extends JPanel
 			// When on the main menu, go to appropriate screen when button is
 			// clicked
 			else
-			{
+			{		
 				if (START_BUTTON.contains(pressed))
 				{
+					intro.play();
 					menu = START_MENU;
 				}
 				else if (STORY_BUTTON.contains(pressed))
 				{
+					storyline.play();
 					menu = STORY;
 				}
 				else if (INSTRUCTIONS_BUTTON.contains(pressed))
 				{
+					howToPlay.play();
 					menu = INSTRUCTIONS_1;
 				}
 			}
@@ -944,7 +970,7 @@ public class SodasplosionGrid extends JPanel
 						+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
 			}
 			else
-			{
+			{		
 				g.setFont(largeFont);
 
 				if (playerOne.getNoOfWins() == totalWins || playerTwo.getNoOfWins() == totalWins)
