@@ -40,9 +40,13 @@ public class SodasplosionGrid extends JPanel
 	// Grid
 	private int[][] grid;
 	private Image border;
-	private Image sidebar;
 	private Image gridImages[];
-
+	
+	//In-game interface
+	private Image sidebar;
+	private Image roundWin;
+	private Image gameWin;
+	
 	// Player
 	private Player playerOne = new Player();
 	private Player playerTwo = new Player();
@@ -53,7 +57,7 @@ public class SodasplosionGrid extends JPanel
 	private Timer timer;
 
 	// Game option
-	private Font font = new Font("Serif", Font.BOLD, 32);
+	private Font font = new Font("Apple LiGothic", Font.BOLD, 32);
 	private int menu = MAIN_MENU;
 	private int noOfPlayers = 2;
 	private int noOfRounds = 1;
@@ -115,6 +119,9 @@ public class SodasplosionGrid extends JPanel
 		instructions1 = new ImageIcon("img/Instructions1.png").getImage();
 		instructions2 = new ImageIcon("img/Instructions2.png").getImage();
 		story = new ImageIcon("img/Story.png").getImage();
+		roundWin = new ImageIcon("img/RoundWin.png").getImage();
+		gameWin = new ImageIcon("img/GameWin.png").getImage();
+		
 
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
@@ -548,8 +555,7 @@ public class SodasplosionGrid extends JPanel
 			// Check menu the screen is currently on
 			if (menu != MAIN_MENU )
 			{
-				
-				
+		
 				// Go to main menu if back to main menu button is pressed at a menu
 				if (BACK_MENU_BUTTON.contains(pressed) && menu != GAME)
 				{
@@ -810,7 +816,7 @@ public class SodasplosionGrid extends JPanel
 		// Draws a menu screen if one of the menus are selected
 		if (menu == GAME)
 		{
-			g.setColor(Color.BLACK);
+			g.setColor(Color.WHITE);
 			
 			g.drawImage(border, 128, 0, this);
 			g.drawImage(sidebar, 0, 0, this);
@@ -827,16 +833,18 @@ public class SodasplosionGrid extends JPanel
 			g.drawImage(playerImages[playerOneImg], currentColOne * IMAGE_WIDTH
 					+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
 			
-			g.drawString("" + playerOne.getNoOfLives(), 70, 262);
-			g.drawString("" + playerOne.getTotalCans(), 70, 300);
-			g.drawString("" + playerOne.getRange(), 70, 338);
+			g.drawString("" + playerOne.getNoOfLives(), 70, 254);
+			g.drawString("" + playerOne.getTotalCans(), 70, 291);
+			g.drawString("" + playerOne.getRange(), 70, 330);
+			g.drawString("" + playerOne.getNoOfWins(), 70, 370);
 
 			g.drawImage(playerImages[playerTwoImg], currentColTwo * IMAGE_WIDTH
 					+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
 			
-			g.drawString("" + playerTwo.getNoOfLives(), 70, 492);
-			g.drawString("" + playerTwo.getTotalCans(), 70, 530);
-			g.drawString("" + playerTwo.getRange(), 70, 568);
+			g.drawString("" + playerTwo.getNoOfLives(), 70, 490);
+			g.drawString("" + playerTwo.getTotalCans(), 70, 528);
+			g.drawString("" + playerTwo.getRange(), 70, 565);
+			g.drawString("" + playerTwo.getNoOfWins(), 70, 605);
 		}
 		else if (menu == MAIN_MENU)
 		{

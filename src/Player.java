@@ -53,7 +53,9 @@ public class Player
 	}
 
 	/**
-	 * Returns the given player's speed
+	 * Get the given player's current number of lives
+	 * 
+	 * @return the given player's current number of lives
 	 */
 	public int getNoOfLives()
 	{
@@ -69,7 +71,9 @@ public class Player
 	}
 	
 	/**
-	 * Returns the given player's blast range
+	 * Gets the given player's blast range
+	 * 
+	 * @return the given player's blast range
 	 */
 	public int getRange()
 	{
@@ -77,7 +81,9 @@ public class Player
 	}
 
 	/**
-	 * Returns the given player's total number of cans
+	 * Get the given player's total number of cans
+	 * 
+	 * @return the given player's total number of cans
 	 */
 	public int getTotalCans()
 	{
@@ -85,7 +91,9 @@ public class Player
 	}
 
 	/**
-	 * Returns the given player's current cans
+	 * Get the given player's current cans
+	 * 
+	 * @return the given player's current cans
 	 */
 	public int getCurrentCans()
 	{
@@ -114,5 +122,15 @@ public class Player
 	public void winRound()
 	{
 		noOfWins++;
+	}
+	
+	/**
+	 * Gets the given player's number of wins
+	 * 
+	 * @return the given player's number of wins
+	 */
+	public int getNoOfWins()
+	{
+		return noOfWins;
 	}
 }
