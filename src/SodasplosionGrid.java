@@ -900,12 +900,12 @@ public class SodasplosionGrid extends JPanel
 					
 					if (playerOne.getNoOfWins() == totalWins)
 					{
-						g.drawImage(playerImages[1], 544, 352, this);
+						g.drawImage(playerImages[1], 535, 330, this);
 						g.drawString("Player One Wins the Game!", 325, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 544, 352, this);
+						g.drawImage(playerImages[6], 535, 330, this);
 						g.drawString("Player Two Wins the Game!", 325, 175);
 					}
 				}
@@ -915,12 +915,12 @@ public class SodasplosionGrid extends JPanel
 
 					if (roundWinner == PLAYER_ONE)
 					{
-						g.drawImage(playerImages[1], 544, 352, this);
+						g.drawImage(playerImages[1], 540, 335, this);
 						g.drawString("Player One Wins Round!", 325, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 544, 352, this);
+						g.drawImage(playerImages[6], 540, 335, this);
 						g.drawString("Player Two Wins Round!", 325, 175);
 					}
 					
