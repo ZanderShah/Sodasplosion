@@ -246,7 +246,8 @@ public class SodasplosionGrid extends JPanel
 		// checks to see which can is being placed (e.g. 1st can, 2nd can, etc),
 		// sets the current can's row and column, and starts the explosion
 		// timer
-		if (player.getCurrentCans() > 0)
+		if (player.getCurrentCans() > 0 && grid[row][col] != BLUECAN 
+				&& grid[row][col] != REDCAN)
 		{
 			player.placeCan();
 
@@ -300,7 +301,7 @@ public class SodasplosionGrid extends JPanel
 		{
 			counter++;
 
-			if (counter == 30)
+			if (counter == 20)
 			{
 				if (grid[canRow][canCol] == REDCAN
 						|| grid[canRow][canCol] == BLUECAN)
@@ -309,7 +310,7 @@ public class SodasplosionGrid extends JPanel
 					checkCollision(canRow, canCol, player);
 				}
 			}
-			else if (counter == 33)
+			else if (counter == 23)
 			{
 				clearExplosions(canRow, canCol, range);
 				player.returnCan();
@@ -955,12 +956,12 @@ public class SodasplosionGrid extends JPanel
 					if (playerOne.getNoOfWins() == totalWins)
 					{
 						g.drawImage(playerImages[1], 535, 330, this);
-						g.drawString("Player One Wins the Game!", 325, 175);
+						g.drawString("Player One Wins the Game!", 290, 175);
 					}
 					else
 					{
 						g.drawImage(playerImages[5], 535, 330, this);
-						g.drawString("Player Two Wins the Game!", 325, 175);
+						g.drawString("Player Two Wins the Game!", 290, 175);
 					}
 				}
 				else
@@ -969,12 +970,12 @@ public class SodasplosionGrid extends JPanel
 
 					if (roundWinner == PLAYER_ONE)
 					{
-						g.drawImage(playerImages[1], 540, 335, this);
+						g.drawImage(playerImages[1], 542, 335, this);
 						g.drawString("Player One Wins Round!", 325, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[5], 540, 335, this);
+						g.drawImage(playerImages[5], 542, 335, this);
 						g.drawString("Player Two Wins Round!", 325, 175);
 					}
 					
