@@ -1,6 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.net.*;
+import java.applet.*;
 
 /**
  * Handles the grid and menu for Sodasplosion
@@ -488,7 +490,7 @@ public class SodasplosionGrid extends JPanel
 				grid[canRow][canCol - leftPos] = EXPLOSION;
 			}
 
-			if (currentRowOne == canRow && currentColOne - leftPos == canCol)
+			if (currentRowOne == canRow && currentColOne == canCol - leftPos)
 			{
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
@@ -502,7 +504,7 @@ public class SodasplosionGrid extends JPanel
 					currentColTwo = -1;
 				}
 			}
-			if (currentRowTwo == canRow && currentColTwo - leftPos == canCol)
+			if (currentRowTwo == canRow && currentColTwo == canCol - leftPos)
 			{
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
@@ -551,7 +553,7 @@ public class SodasplosionGrid extends JPanel
 				grid[canRow][canCol + rightPos] = EXPLOSION;
 			}
 
-			if (currentRowOne == canRow && currentColOne + rightPos == canCol)
+			if (currentRowOne == canRow && currentColOne == canCol + rightPos)
 			{
 				playerOne.loseLife();
 				if (playerOne.getNoOfLives() < 1)
@@ -565,7 +567,7 @@ public class SodasplosionGrid extends JPanel
 					currentColTwo = -1;
 				}
 			}
-			if (currentRowTwo == canRow && currentColTwo + rightPos == canCol)
+			if (currentRowTwo == canRow && currentColTwo == canCol + rightPos)
 			{
 				playerTwo.loseLife();
 				if (playerTwo.getNoOfLives() < 1)
@@ -603,6 +605,26 @@ public class SodasplosionGrid extends JPanel
 		}
 	}
 
+	/**
+	 * Gets the URL needed for newAudioClip
+	 * 
+	 * @param fileName the given file name
+	 * @return the URL needed for newAudioClip
+	 */
+	public URL getCompleteURL(String fileName)
+	{
+		try
+		{
+			return new URL("file:" + System.getProperty("user.dir") + "/"
+					+ fileName);
+		}
+		catch (MalformedURLException e)
+		{
+			System.err.println(e.getMessage());
+		}
+		return null;
+	}
+	
 	/**
 	 * Inner class to deal with mouse presses
 	 *
@@ -742,7 +764,7 @@ public class SodasplosionGrid extends JPanel
 		 */
 		public void keyPressed(KeyEvent event)
 		{
-			if (menu == GAME)
+			if (menu == GAME && !roundOver)
 			{
 				// Change the currentRow and currentColumn of the player
 				// based on the key pressed
@@ -937,7 +959,7 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 535, 330, this);
+						g.drawImage(playerImages[5], 535, 330, this);
 						g.drawString("Player Two Wins the Game!", 325, 175);
 					}
 				}
@@ -952,7 +974,7 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						g.drawImage(playerImages[6], 540, 335, this);
+						g.drawImage(playerImages[5], 540, 335, this);
 						g.drawString("Player Two Wins Round!", 325, 175);
 					}
 					
