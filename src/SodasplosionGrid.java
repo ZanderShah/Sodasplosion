@@ -51,7 +51,7 @@ public class SodasplosionGrid extends JPanel
 	private final int PLAYER_TWO = -1;
 
 	// Program variables
-	
+
 	// Boolean flags
 	private boolean gameOver;
 	private boolean roundOver;
@@ -90,7 +90,7 @@ public class SodasplosionGrid extends JPanel
 
 	// In-game sidebar
 	private Rectangle IN_GAME_BACK = new Rectangle(15, 632, 100, 30);
-	private Rectangle IN_GAME_INSTRUCTIONS = new Rectangle (15, 678, 100, 30);
+	private Rectangle IN_GAME_INSTRUCTIONS = new Rectangle(15, 678, 100, 30);
 	private Rectangle IN_GAME_EXIT = new Rectangle(15, 724, 100, 30);
 	private int inGameHelp = 0;
 	private Image inGameInstructions1, inGameInstructions2;
@@ -108,7 +108,6 @@ public class SodasplosionGrid extends JPanel
 	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
 	private Rectangle MENU_EXIT = new Rectangle(800, 698, 140, 40);
 	private Rectangle[] TOTAL_WINS = new Rectangle[10];
-	
 
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
@@ -158,8 +157,10 @@ public class SodasplosionGrid extends JPanel
 		story = new ImageIcon("img/Story.png").getImage();
 		roundWin = new ImageIcon("img/RoundWin.png").getImage();
 		gameWin = new ImageIcon("img/GameWin.png").getImage();
-		inGameInstructions1 = new ImageIcon("img/InstructionsIG1.png").getImage();
-		inGameInstructions2 = new ImageIcon("img/InstructionsIG2.png").getImage();
+		inGameInstructions1 = new ImageIcon("img/InstructionsIG1.png")
+				.getImage();
+		inGameInstructions2 = new ImageIcon("img/InstructionsIG2.png")
+				.getImage();
 
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
@@ -339,7 +340,8 @@ public class SodasplosionGrid extends JPanel
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
-			generateAIMove();
+			//generateAIMove();
+
 			counter++;
 
 			if (counter == 20)
@@ -523,14 +525,14 @@ public class SodasplosionGrid extends JPanel
 					{
 						resetGame(ROUND);
 					}
-					
+
 					if (inGameHelp == 0)
 					{
 						if (IN_GAME_BACK.contains(pressed))
 						{
 							menu = MAIN_MENU;
 						}
-						else if(IN_GAME_INSTRUCTIONS.contains(pressed))
+						else if (IN_GAME_INSTRUCTIONS.contains(pressed))
 						{
 							inGameHelp = 1;
 						}
@@ -553,7 +555,8 @@ public class SodasplosionGrid extends JPanel
 							}
 							else
 							{
-								inGameHelp = 1;;
+								inGameHelp = 1;
+								;
 							}
 						}
 					}
@@ -874,12 +877,12 @@ public class SodasplosionGrid extends JPanel
 						g.drawString("Player Two Wins Round!", 312, 175);
 					}
 					g.setFont(standardFont);
-					
+
 					g.drawString("Click anywhere to continue...", 362, 600);
 				}
 			}
-			
-			if(inGameHelp == 1)
+
+			if (inGameHelp == 1)
 			{
 				g.drawImage(inGameInstructions1, 0, 0, this);
 			}
@@ -935,12 +938,12 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/*
-	 * AI STUFF (INCOMPLETE)
+	 * AI STUFF BELOW (Incomplete)
 	 * 
-	 * WRITTEN BY HENRY BULLINGHAM
+	 * Mostly written by Henry Bullingham
 	 */
 
-	private void updateAITraversalGrid()
+	/*private void updateAITraversalGrid()
 	{
 		if (noOfPlayers == 1)
 		{
@@ -986,13 +989,15 @@ public class SodasplosionGrid extends JPanel
 	{
 		if (noOfPlayers == 1)
 		{
-			for (int direction = 0; direction < 4; direction++)
+			for (int direction = 0; direction < DROW.length; direction++)
 			{
 				boolean wallHit = false;
+
 				for (int dPos = 1; dPos <= range && !wallHit; dPos++)
 				{
 					int checkRow = row + dPos * DROW[direction];
 					int checkCol = col + dPos * DCOL[direction];
+
 					if (isInBounds(checkRow, checkCol)
 							&& grid[checkRow][checkCol] != BUILDING
 							&& grid[checkRow][checkCol] != CRATE)
@@ -1010,11 +1015,8 @@ public class SodasplosionGrid extends JPanel
 
 	private void generateAIMove()
 	{
-		if (noOfPlayers == 1)
+		if (noOfPlayers == 1 && isInBounds(currentRowTwo, currentColTwo))
 		{
-			if (!isInBounds(currentRowTwo, currentColTwo))
-				return;
-
 			updateAITraversalGrid();
 
 			LinkedList<Node> pathfindingQueue = new LinkedList<Node>();
@@ -1030,7 +1032,6 @@ public class SodasplosionGrid extends JPanel
 
 			while (!pathfindingQueue.isEmpty())
 			{
-
 				Node next = pathfindingQueue.removeFirst();
 				if (isInBounds(next.row, next.column))
 				{
@@ -1059,14 +1060,10 @@ public class SodasplosionGrid extends JPanel
 							enemy = next;
 						}
 						if (aiTraversalGrid[next.row][next.column] == EMPTY
-								||
-								aiTraversalGrid[next.row][next.column] == POWERUP
-								||
-								(aiTraversalGrid[next.row][next.column] == EXPLOSION
-										&&
-										explosionIds[next.row][next.column] == 0
-										&&
-										inDanger && closestEmpty == null))
+								|| aiTraversalGrid[next.row][next.column] == POWERUP
+								|| (aiTraversalGrid[next.row][next.column] == EXPLOSION
+										&& explosionIds[next.row][next.column] == 0
+										&& inDanger && closestEmpty == null))
 						{
 							for (int direction = 0; direction < 4; direction++)
 							{
@@ -1085,9 +1082,6 @@ public class SodasplosionGrid extends JPanel
 				{
 					currentRowTwo = closestEmpty.row;
 					currentColTwo = closestEmpty.column;
-				}
-				else
-				{
 				}
 			}
 			else if (enemy != null)
@@ -1124,5 +1118,5 @@ public class SodasplosionGrid extends JPanel
 			// applicable,
 			// drop some random bombs
 		}
-	}
+	}*/
 }
