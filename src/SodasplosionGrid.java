@@ -88,9 +88,12 @@ public class SodasplosionGrid extends JPanel
 	private int totalWins = 1;
 	private int mapType = 1;
 
-	// Rectangles for in-game side bar
-	private Rectangle IN_GAME_BACK = new Rectangle(15, 631, 100, 70);
-	private Rectangle EXIT_BUTTON = new Rectangle(15, 711, 100, 45);
+	// In-game sidebar
+	private Rectangle IN_GAME_BACK = new Rectangle(15, 632, 100, 30);
+	private Rectangle IN_GAME_INSTRUCTIONS = new Rectangle (15, 678, 100, 30);
+	private Rectangle IN_GAME_EXIT = new Rectangle(15, 724, 100, 30);
+	private int inGameHelp = 0;
+	private Image inGameInstructions1, inGameInstructions2;
 
 	// Rectangles for the menu screens
 	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
@@ -103,13 +106,12 @@ public class SodasplosionGrid extends JPanel
 	private Rectangle CLASSIC = new Rectangle(560, 73, 150, 150);
 	private Rectangle SHOWDOWN = new Rectangle(787, 73, 150, 150);
 	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
+	private Rectangle MENU_EXIT = new Rectangle(800, 698, 140, 40);
 	private Rectangle[] TOTAL_WINS = new Rectangle[10];
+	
 
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
-
-	// Sound
-	private AudioClip intro, storyline, howToPlay, boom, collision;
 
 	// AI
 	private int[][] aiTraversalGrid;
@@ -156,12 +158,8 @@ public class SodasplosionGrid extends JPanel
 		story = new ImageIcon("img/Story.png").getImage();
 		roundWin = new ImageIcon("img/RoundWin.png").getImage();
 		gameWin = new ImageIcon("img/GameWin.png").getImage();
-
-		intro = Applet.newAudioClip(getCompleteURL("sound/intro.wav"));
-		storyline = Applet.newAudioClip(getCompleteURL("sound/story.wav"));
-		howToPlay = Applet.newAudioClip(getCompleteURL("sound/howToPlay.wav"));
-		boom = Applet.newAudioClip(getCompleteURL("sound/boom.wav"));
-		collision = Applet.newAudioClip(getCompleteURL("sound/collision.wav"));
+		inGameInstructions1 = new ImageIcon("img/InstructionsIG1.png").getImage();
+		inGameInstructions2 = new ImageIcon("img/InstructionsIG2.png").getImage();
 
 		// Sets up the icons for the number of rounds
 		for (int round = 1; round <= 9; round++)
@@ -373,8 +371,6 @@ public class SodasplosionGrid extends JPanel
 	 */
 	public void checkCollision(int canRow, int canCol, Player player, long id)
 	{
-		boom.play();
-
 		int range = player.getRange();
 
 		// Collision code all directions using an outer for loop
@@ -426,7 +422,6 @@ public class SodasplosionGrid extends JPanel
 				if (currentRowOne == checkRow && currentColOne == checkCol)
 				{
 					playerOne.loseLife();
-					collision.play();
 					if (playerOne.getNoOfLives() < 1)
 					{
 						playerTwo.winRound();
@@ -441,7 +436,6 @@ public class SodasplosionGrid extends JPanel
 				if (currentRowTwo == checkRow && currentColTwo == checkCol)
 				{
 					playerTwo.loseLife();
-					collision.play();
 					if (playerTwo.getNoOfLives() < 1)
 					{
 						playerOne.winRound();
@@ -493,26 +487,6 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/**
-	 * Gets the URL needed for newAudioClip
-	 * 
-	 * @param fileName the given file name
-	 * @return the URL needed for newAudioClip
-	 */
-	public URL getCompleteURL(String fileName)
-	{
-		try
-		{
-			return new URL("file:" + System.getProperty("user.dir") + "/"
-					+ fileName);
-		}
-		catch (MalformedURLException e)
-		{
-			System.err.println(e.getMessage());
-		}
-		return null;
-	}
-
-	/**
 	 * Inner class to deal with mouse presses
 	 *
 	 * @author Alexander Shah and Amy Zhang
@@ -549,13 +523,39 @@ public class SodasplosionGrid extends JPanel
 					{
 						resetGame(ROUND);
 					}
-					if (IN_GAME_BACK.contains(pressed))
+					
+					if (inGameHelp == 0)
 					{
-						menu = MAIN_MENU;
+						if (IN_GAME_BACK.contains(pressed))
+						{
+							menu = MAIN_MENU;
+						}
+						else if(IN_GAME_INSTRUCTIONS.contains(pressed))
+						{
+							inGameHelp = 1;
+						}
+						else if (IN_GAME_EXIT.contains(pressed))
+						{
+							System.exit(0);
+						}
 					}
-					else if (EXIT_BUTTON.contains(pressed))
+					else
 					{
-						System.exit(0);
+						if (BACK_MENU_BUTTON.contains(pressed))
+						{
+							inGameHelp = 0;
+						}
+						else if (PAGE_BUTTON.contains(pressed))
+						{
+							if (inGameHelp == 1)
+							{
+								inGameHelp = 2;
+							}
+							else
+							{
+								inGameHelp = 1;;
+							}
+						}
 					}
 				}
 
@@ -621,18 +621,19 @@ public class SodasplosionGrid extends JPanel
 			{
 				if (START_BUTTON.contains(pressed))
 				{
-					intro.play();
 					menu = START_MENU;
 				}
 				else if (STORY_BUTTON.contains(pressed))
 				{
-					storyline.play();
 					menu = STORY;
 				}
 				else if (INSTRUCTIONS_BUTTON.contains(pressed))
 				{
-					howToPlay.play();
 					menu = INSTRUCTIONS_1;
+				}
+				else if (MENU_EXIT.contains(pressed))
+				{
+					System.exit(0);
 				}
 			}
 			repaint();
@@ -873,8 +874,18 @@ public class SodasplosionGrid extends JPanel
 						g.drawString("Player Two Wins Round!", 312, 175);
 					}
 					g.setFont(standardFont);
-					g.drawString("Click anywhere to continue", 370, 600);
+					
+					g.drawString("Click anywhere to continue...", 362, 600);
 				}
+			}
+			
+			if(inGameHelp == 1)
+			{
+				g.drawImage(inGameInstructions1, 0, 0, this);
+			}
+			else if (inGameHelp == 2)
+			{
+				g.drawImage(inGameInstructions2, 0, 0, this);
 			}
 		}
 		else if (menu == MAIN_MENU)
