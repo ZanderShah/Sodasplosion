@@ -53,7 +53,6 @@ public class SodasplosionGrid extends JPanel
 
 	// Grid
 	private int[][] grid;
-	private int[][]	explosionGrid;
 	private Image border;
 	private Image gridImages[];
 
@@ -202,7 +201,6 @@ public class SodasplosionGrid extends JPanel
 		// Declares number of rows and number of columns and sets up an array to
 		// keep track of the grid
 		grid = new int[11][13];
-		explosionGrid = new int[11][13];
 		aiTraversalGrid = new int[11][13];
 
 		// Sets the initial positions for player one and player two
@@ -329,14 +327,13 @@ public class SodasplosionGrid extends JPanel
 				if (grid[canRow][canCol] == REDCAN
 						|| grid[canRow][canCol] == BLUECAN)
 				{
-					grid[canRow][canCol] = EMPTY;
-					explosionGrid[canRow][canCol] = EXPLOSION;
+					grid[canRow][canCol] = EXPLOSION;
 					checkCollision(canRow, canCol, player);
 				}
 			}
 			else if (counter == 23)
 			{
-				clearExplosions(canRow, canCol, range);
+				clearExplosions(canRow, canCol);
 				player.returnCan();
 				explosions.removeActionListener(this);
 			}
@@ -375,8 +372,6 @@ public class SodasplosionGrid extends JPanel
 				int checkRow = canRow + dPos * DROW[direction];
 				int checkCol = canCol + dPos * DCOL[direction];
 
-				explosionGrid[checkRow][checkCol] =  EXPLOSION;
-				
 				if (grid[checkRow][checkCol] == CRATE)
 				{
 					int item = (int) (Math.random() * 10);
@@ -387,7 +382,7 @@ public class SodasplosionGrid extends JPanel
 					}
 					else
 					{
-						grid[checkRow][checkCol] = EMPTY;
+						grid[checkRow][checkCol] = EXPLOSION;
 					}
 
 					alreadyHitSomething = true;
@@ -395,8 +390,12 @@ public class SodasplosionGrid extends JPanel
 				else if (grid[checkRow][checkCol] == REDCAN
 						|| grid[checkRow][checkCol] == BLUECAN)
 				{
-					grid[checkRow][checkCol] = EMPTY;
+					grid[checkRow][checkCol] = EXPLOSION;
 					checkCollision(checkRow, checkCol, player);
+				}
+				else
+				{
+					grid[checkRow][checkCol] = EXPLOSION;
 				}
 
 				if (currentRowOne == checkRow && currentColOne == checkCol)
@@ -440,15 +439,15 @@ public class SodasplosionGrid extends JPanel
 	 * @param canCol the given column of the can
 	 * @param range the range that the explosion could reach
 	 */
-	public void clearExplosions(int canRow, int canCol, int range)
-	{
+	public void clearExplosions(int canRow, int canCol)
+	{	
 		for (int row = 0; row < grid.length; row++)
 		{
 			for (int col = 0; col < grid[0].length; col++)
 			{
-				if (explosionGrid[row][col] == EXPLOSION)
+				if (grid[row][col] == EXPLOSION)
 				{
-					explosionGrid[row][col] = EMPTY;
+					grid[row][col] = EMPTY;
 				}
 			}
 		}
@@ -789,7 +788,6 @@ public class SodasplosionGrid extends JPanel
 
 			if (!roundOver)
 			{
-				// Draws the images on the grid (not including explosions)
 				for (int row = 0; row < grid.length; row++)
 				{
 					for (int column = 0; column < grid[0].length; column++)
@@ -807,17 +805,6 @@ public class SodasplosionGrid extends JPanel
 				g.drawImage(playerImages[playerTwoImg], currentColTwo
 						* IMAGE_WIDTH
 						+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
-				
-				// Draws the explosions on the grid 
-				for (int row = 0; row < explosionGrid.length; row++)
-				{
-					for (int column = 0; column < explosionGrid[0].length; column++)
-					{
-						g.drawImage(gridImages[explosionGrid[row][column]], column
-								* IMAGE_WIDTH + 160, row * IMAGE_HEIGHT + 32,
-								this);
-					}
-				}
 			}
 			else
 			{
