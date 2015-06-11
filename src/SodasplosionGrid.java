@@ -1,7 +1,5 @@
 import java.awt.*;
-
 import javax.swing.*;
-
 import java.awt.event.*;
 import java.net.*;
 import java.util.LinkedList;
@@ -35,7 +33,7 @@ public class SodasplosionGrid extends JPanel
 	private final int REDCAN = 6;
 	private final int BLUECAN = 7;
 	private final int EXPLOSION = 8;
-	
+
 	// Menu
 	private final int GAME = -1;
 	private final int ROUND = 0;
@@ -50,7 +48,6 @@ public class SodasplosionGrid extends JPanel
 	private final int PLAYER_TWO = -1;
 
 	// Program variables
-
 	private boolean gameOver;
 	private boolean roundOver;
 
@@ -73,12 +70,6 @@ public class SodasplosionGrid extends JPanel
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
 
-	//AI
-	private int [][] aiTraversalGrid;
-	private static final int MOVE = 0;
-	private static final int PLACE_BOMB = 1;
-	private LinkedList<Integer> aiMoveQueue;
-	
 	// Timers
 	private Timer explosions;
 
@@ -112,6 +103,12 @@ public class SodasplosionGrid extends JPanel
 
 	// Sound
 	private AudioClip intro, storyline, howToPlay, boom, collision;
+
+	// AI
+	private int[][] aiTraversalGrid;
+	private static final int MOVE = 0;
+	private static final int PLACE_BOMB = 1;
+	private LinkedList<Integer> aiMoveQueue;
 
 	/**
 	 * Constructs a new grid
@@ -203,10 +200,8 @@ public class SodasplosionGrid extends JPanel
 
 		// Declares number of rows and number of columns and sets up an array to
 		// keep track of the grid
-		int noOfRows = 11;
-		int noOfColumns = 13;
-		grid = new int[noOfRows][noOfColumns];
-		aiTraversalGrid = new int[noOfRows][noOfColumns];
+		grid = new int[11][13];
+		aiTraversalGrid = new int[11][13];
 
 		// Sets the initial positions for player one and player two
 		currentRowOne = 0;
@@ -361,20 +356,24 @@ public class SodasplosionGrid extends JPanel
 		int range = player.getRange();
 
 		// Collision code all directions using an outer for loop
-		boolean alreadyHitSomething = false;
-		
+		boolean alreadyHitSomething;
+
 		for (int direction = 0; direction < DROW.length; direction++)
 		{
 			alreadyHitSomething = false;
-			
-			for (int dPos = 1; dPos <= range && canRow + dPos*DROW[direction] >= 0 && canRow + dPos*DROW[direction] < grid.length &&
-					canCol + dPos*DCOL[direction] >= 0 && canCol + dPos*DCOL[direction] < grid[0].length
-					&& grid[canRow + dPos*DROW[direction]][canCol + dPos*DCOL[direction]] != BUILDING
+
+			for (int dPos = 1; dPos <= range
+					&& canRow + dPos * DROW[direction] >= 0
+					&& canRow + dPos * DROW[direction] < grid.length
+					&& canCol + dPos * DCOL[direction] >= 0
+					&& canCol + dPos * DCOL[direction] < grid[0].length
+					&& grid[canRow + dPos * DROW[direction]][canCol + dPos
+							* DCOL[direction]] != BUILDING
 					&& !alreadyHitSomething; dPos++)
 			{
-				int checkRow = canRow + dPos*DROW[direction];
-				int checkCol = canCol + dPos*DCOL[direction];
-				
+				int checkRow = canRow + dPos * DROW[direction];
+				int checkCol = canCol + dPos * DCOL[direction];
+
 				if (grid[checkRow][checkCol] == CRATE)
 				{
 					int item = (int) (Math.random() * 10);
@@ -809,13 +808,13 @@ public class SodasplosionGrid extends JPanel
 
 					if (playerOne.getNoOfWins() == totalWins)
 					{
-						g.drawImage(playerImages[1], 535, 330, this);
-						g.drawString("Player One Wins the Game!", 290, 175);
+						g.drawImage(playerImages[1], 534, 330, this);
+						g.drawString("Player One Wins the Game!", 277, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[5], 535, 330, this);
-						g.drawString("Player Two Wins the Game!", 290, 175);
+						g.drawImage(playerImages[5], 534, 330, this);
+						g.drawString("Player Two Wins the Game!", 277, 175);
 					}
 				}
 				else
@@ -824,17 +823,16 @@ public class SodasplosionGrid extends JPanel
 
 					if (roundWinner == PLAYER_ONE)
 					{
-						g.drawImage(playerImages[1], 542, 335, this);
-						g.drawString("Player One Wins Round!", 325, 175);
+						g.drawImage(playerImages[1], 539, 338, this);
+						g.drawString("Player One Wins Round!", 312, 175);
 					}
 					else
 					{
-						g.drawImage(playerImages[5], 542, 335, this);
-						g.drawString("Player Two Wins Round!", 325, 175);
+						g.drawImage(playerImages[5], 539, 338, this);
+						g.drawString("Player Two Wins Round!", 312, 175);
 					}
-
-					g.drawString("Click anywhere on the", 300, 600);
-					g.drawString("screen to continue ...", 300, 650);
+					g.setFont(standardFont);
+					g.drawString("Click anywhere to continue", 370, 600);
 				}
 			}
 		}
@@ -884,57 +882,84 @@ public class SodasplosionGrid extends JPanel
 		}
 	}
 
-	private void updateAItraversalGrid(){
-		for (int row = 0; row < grid.length; row ++){
-			for ( int col = 0; col < grid[row].length; col ++){
+	/*
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * AI STUFF (INCOMPLETE)
+	 */
+
+	private void updateAItraversalGrid()
+	{
+		for (int row = 0; row < grid.length; row++)
+		{
+			for (int col = 0; col < grid[row].length; col++)
+			{
 				aiTraversalGrid[row][col] = grid[row][col];
-				if (aiTraversalGrid[row][col] == REDCAN){
-					markDangerInAIGrid(row,col, playerOne.getRange());
-				} else if (aiTraversalGrid[row][col] == BLUECAN){
-					markDangerInAIGrid(row,col, playerTwo.getRange());
+				if (aiTraversalGrid[row][col] == REDCAN)
+				{
+					markDangerInAIGrid(row, col, playerOne.getRange());
+				}
+				else if (aiTraversalGrid[row][col] == BLUECAN)
+				{
+					markDangerInAIGrid(row, col, playerTwo.getRange());
 				}
 			}
 		}
 	}
-	
-	private void markDangerInAIGrid (int row, int col, int range){
+
+	private void markDangerInAIGrid(int row, int col, int range)
+	{
 		aiTraversalGrid[row][col] = EXPLOSION;
-		for (int direction = 0; direction < 4; direction ++){
+		for (int direction = 0; direction < 4; direction++)
+		{
 			boolean wallHit = false;
-			for (int dPos = 1; dPos < range && !wallHit; dPos ++){
-				int checkRow = row + dPos*DROW[direction];
-				int checkCol = col + dPos*DCOL[direction];
-				if (isInBounds(checkRow,checkCol) && grid[checkRow][checkCol] != BUILDING && grid[checkRow][checkCol] != CRATE){
+			for (int dPos = 1; dPos < range && !wallHit; dPos++)
+			{
+				int checkRow = row + dPos * DROW[direction];
+				int checkCol = col + dPos * DCOL[direction];
+				if (isInBounds(checkRow, checkCol)
+						&& grid[checkRow][checkCol] != BUILDING
+						&& grid[checkRow][checkCol] != CRATE)
+				{
 					grid[checkRow][checkCol] = EXPLOSION;
-				} else {
+				}
+				else
+				{
 					wallHit = true;
 				}
 			}
 		}
 	}
-	
-	boolean isInBounds (int row, int col){
-		return row >= 0 && row < grid.length && col >= 0 && col < grid[row].length;
+
+	boolean isInBounds(int row, int col)
+	{
+		return row >= 0 && row < grid.length && col >= 0
+				&& col < grid[row].length;
 	}
-	
-	private void generateAiMove (){
-		if (aiTraversalGrid[currentRowTwo][currentColTwo] == EXPLOSION){
-			//GTfO
+
+	private void generateAiMove()
+	{
+		if (aiTraversalGrid[currentRowTwo][currentColTwo] == EXPLOSION)
+		{
+			// GTfO
 		}
-		//Check if in danger zone
-		//get out of danger zone
-		
-		//check for enemy player
-		//go near
-		//drop bomb
-		
-		//check for available power ups
-		//get it
-		
-		//Check for closest available wall
-		//Move to wall
-		//drop bomb
-		
+		// Check if in danger zone
+		// get out of danger zone
+
+		// check for enemy player
+		// go near
+		// drop bomb
+
+		// check for available power ups
+		// get it
+
+		// Check for closest available wall
+		// Move to wall
+		// drop bomb
+
 	}
-	
+
 }
