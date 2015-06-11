@@ -66,15 +66,10 @@ public class SodasplosionGrid extends JPanel
 	private Image playerImages[];
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
-<<<<<<< HEAD
-	private Timer timer;
-	
-=======
 	
 	// Timers
 	private Timer explosions;
 
->>>>>>> origin/master
 	// Game option
 	private Font standardFont = new Font("Apple LiGothic", Font.BOLD, 32);
 	private Font largeFont = new Font("Apple LiGothic", Font.BOLD, 48);
@@ -83,10 +78,13 @@ public class SodasplosionGrid extends JPanel
 	private int totalWins = 1;
 	private int mapType = 1;
 
-	// Rectangles for in-game sidebar
-	private Rectangle IN_GAME_BACK = new Rectangle(15, 631, 100, 70);
-	private Rectangle EXIT_BUTTON = new Rectangle(15, 711, 100, 45);
-
+	// In-game sidebar
+	private Rectangle IN_GAME_BACK = new Rectangle(15, 632, 100, 30);
+	private Rectangle IN_GAME_INSTRUCTIONS = new Rectangle (15, 678, 100, 30);
+	private Rectangle IN_GAME_EXIT = new Rectangle(15, 724, 100, 30);
+	private int inGameHelp = 0;
+	private Image inGameInstructions1, inGameInstructions2;
+	
 	// Rectangles for the menu screens
 	private Rectangle START_BUTTON = new Rectangle(170, 453, 150, 40);
 	private Rectangle STORY_BUTTON = new Rectangle(366, 453, 150, 40);
@@ -98,7 +96,9 @@ public class SodasplosionGrid extends JPanel
 	private Rectangle CLASSIC = new Rectangle(560, 73, 150, 150);
 	private Rectangle SHOWDOWN = new Rectangle(787, 73, 150, 150);
 	private Rectangle PLAY_BUTTON = new Rectangle(265, 518, 530, 150);
+	private Rectangle MENU_EXIT = new Rectangle(800, 698, 140, 40);
 	private Rectangle[] TOTAL_WINS = new Rectangle[10];
+	
 
 	// Images for the menu screen
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
@@ -144,7 +144,9 @@ public class SodasplosionGrid extends JPanel
 		story = new ImageIcon("img/Story.png").getImage();
 		roundWin = new ImageIcon("img/RoundWin.png").getImage();
 		gameWin = new ImageIcon("img/GameWin.png").getImage();
-
+		inGameInstructions1 = new ImageIcon("img/InstructionsIG1.png").getImage();
+		inGameInstructions2 = new ImageIcon("img/InstructionsIG2.png").getImage();
+		
 		intro = Applet.newAudioClip(getCompleteURL("sound/intro.wav"));
 		storyline = Applet.newAudioClip(getCompleteURL("sound/story.wav"));
 		howToPlay = Applet.newAudioClip(getCompleteURL("sound/howToPlay.wav"));
@@ -690,13 +692,39 @@ public class SodasplosionGrid extends JPanel
 					{
 						resetGame(ROUND);
 					}
-					if (IN_GAME_BACK.contains(pressed))
+					
+					if (inGameHelp == 0)
 					{
-						menu = MAIN_MENU;
+						if (IN_GAME_BACK.contains(pressed))
+						{
+							menu = MAIN_MENU;
+						}
+						else if(IN_GAME_INSTRUCTIONS.contains(pressed))
+						{
+							inGameHelp = 1;
+						}
+						else if (IN_GAME_EXIT.contains(pressed))
+						{
+							System.exit(0);
+						}
 					}
-					else if (EXIT_BUTTON.contains(pressed))
+					else
 					{
-						System.exit(0);
+						if (BACK_MENU_BUTTON.contains(pressed))
+						{
+							inGameHelp = 0;
+						}
+						else if (PAGE_BUTTON.contains(pressed))
+						{
+							if (inGameHelp == 1)
+							{
+								inGameHelp = 2;
+							}
+							else
+							{
+								inGameHelp = 1;;
+							}
+						}
 					}
 				}
 
@@ -774,6 +802,10 @@ public class SodasplosionGrid extends JPanel
 				{
 					howToPlay.play();
 					menu = INSTRUCTIONS_1;
+				}
+				else if (MENU_EXIT.contains(pressed))
+				{
+					System.exit(0);
 				}
 			}
 			repaint();
@@ -1017,8 +1049,17 @@ public class SodasplosionGrid extends JPanel
 						g.drawString("Player Two Wins Round!", 312, 175);
 					}
 					g.setFont(standardFont);
-					g.drawString("Click anywhere to continue", 370, 600);
-				}	
+					g.drawString("Click anywhere to continue...", 362, 600);
+				}
+			}
+			
+			if(inGameHelp == 1)
+			{
+				g.drawImage(inGameInstructions1, 0, 0, this);
+			}
+			else if (inGameHelp == 2)
+			{
+				g.drawImage(inGameInstructions2, 0, 0, this);
 			}
 		}
 		else if (menu == MAIN_MENU)
