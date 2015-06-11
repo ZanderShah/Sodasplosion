@@ -1,7 +1,10 @@
 import java.awt.*;
+
 import javax.swing.*;
+
 import java.awt.event.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.applet.*;
 
@@ -48,6 +51,8 @@ public class SodasplosionGrid extends JPanel
 	private final int PLAYER_TWO = -1;
 
 	// Program variables
+	
+	// Boolean flags
 	private boolean gameOver;
 	private boolean roundOver;
 
@@ -70,8 +75,10 @@ public class SodasplosionGrid extends JPanel
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
 
-	// Timers
+	// Explosions
 	private Timer explosions;
+	private long sodasplosionId = 1;
+	private long[][] explosionIds;
 
 	// Game option
 	private Font standardFont = new Font("Apple LiGothic", Font.BOLD, 32);
@@ -108,6 +115,7 @@ public class SodasplosionGrid extends JPanel
 	private int[][] aiTraversalGrid;
 	private static final int MOVE = 0;
 	private static final int PLACE_BOMB = 1;
+	private final int POWERUP = 9;
 	private LinkedList<Integer> aiMoveQueue;
 
 	/**
@@ -202,6 +210,7 @@ public class SodasplosionGrid extends JPanel
 		// keep track of the grid
 		grid = new int[11][13];
 		aiTraversalGrid = new int[11][13];
+		explosionIds = new long[11][13];
 
 		// Sets the initial positions for player one and player two
 		currentRowOne = 0;
@@ -287,6 +296,16 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/**
+	 * Gives the id for the next explosion group
+	 * @return the unique id for the next explosion group
+	 */
+	public long getNextBombId()
+	{
+		sodasplosionId++;
+		return sodasplosionId - 1;
+	}
+
+	/**
 	 * An inner class that deals with the timer events
 	 * 
 	 * @author Alexander Shah and Amy Zhang
@@ -296,6 +315,7 @@ public class SodasplosionGrid extends JPanel
 	{
 		Player player;
 		int canRow, canCol, range, counter;
+		long id;
 
 		/**
 		 * Constructor for the TimerEventHandler
@@ -309,6 +329,7 @@ public class SodasplosionGrid extends JPanel
 			this.canRow = canRow;
 			this.canCol = canCol;
 			this.range = range;
+			this.id = getNextBombId();
 			counter = 0;
 		}
 
@@ -320,6 +341,7 @@ public class SodasplosionGrid extends JPanel
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
+			generateAIMove();
 			counter++;
 
 			if (counter == 20)
@@ -328,12 +350,12 @@ public class SodasplosionGrid extends JPanel
 						|| grid[canRow][canCol] == BLUECAN)
 				{
 					grid[canRow][canCol] = EXPLOSION;
-					checkCollision(canRow, canCol, player);
+					checkCollision(canRow, canCol, player, id);
 				}
 			}
 			else if (counter == 23)
 			{
-				clearExplosions(canRow, canCol);
+				clearExplosions(canRow, canCol, id);
 				player.returnCan();
 				explosions.removeActionListener(this);
 			}
@@ -349,7 +371,7 @@ public class SodasplosionGrid extends JPanel
 	 * @param canCol the given column of the can
 	 * @param player the player that placed the can
 	 */
-	public void checkCollision(int canRow, int canCol, Player player)
+	public void checkCollision(int canRow, int canCol, Player player, long id)
 	{
 		boom.play();
 
@@ -383,6 +405,7 @@ public class SodasplosionGrid extends JPanel
 					else
 					{
 						grid[checkRow][checkCol] = EXPLOSION;
+						explosionIds[checkRow][checkCol] = id;
 					}
 
 					alreadyHitSomething = true;
@@ -391,11 +414,13 @@ public class SodasplosionGrid extends JPanel
 						|| grid[checkRow][checkCol] == BLUECAN)
 				{
 					grid[checkRow][checkCol] = EXPLOSION;
-					checkCollision(checkRow, checkCol, player);
+					explosionIds[checkRow][checkCol] = id;
+					checkCollision(checkRow, checkCol, player, id);
 				}
 				else
 				{
 					grid[checkRow][checkCol] = EXPLOSION;
+					explosionIds[checkRow][checkCol] = id;
 				}
 
 				if (currentRowOne == checkRow && currentColOne == checkCol)
@@ -439,20 +464,21 @@ public class SodasplosionGrid extends JPanel
 	 * @param canCol the given column of the can
 	 * @param range the range that the explosion could reach
 	 */
-	public void clearExplosions(int canRow, int canCol)
-	{	
+	public void clearExplosions(int canRow, int canCol, long id)
+	{
 		for (int row = 0; row < grid.length; row++)
 		{
 			for (int col = 0; col < grid[0].length; col++)
 			{
-				if (grid[row][col] == EXPLOSION)
+				if (explosionIds[row][col] == id)
 				{
 					grid[row][col] = EMPTY;
+					explosionIds[row][col] = EMPTY;
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks whether or not a check will go out of bounds
 	 * 
@@ -699,57 +725,61 @@ public class SodasplosionGrid extends JPanel
 				}
 
 				// Player two
-				if (event.getKeyCode() == KeyEvent.VK_LEFT && currentColTwo > 0
-						&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
-						&& grid[currentRowTwo][currentColTwo - 1] != CRATE
-						&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
-						&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
+				if (noOfPlayers == 2)
 				{
-					currentColTwo--;
-					playerTwoImg = 4;
-				}
-				else if (event.getKeyCode() == KeyEvent.VK_RIGHT
-						&& currentColTwo < grid[0].length - 1
-						&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
-						&& grid[currentRowTwo][currentColTwo + 1] != CRATE
-						&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
-						&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
-				{
-					currentColTwo++;
-					playerTwoImg = 6;
-				}
-				else if (event.getKeyCode() == KeyEvent.VK_UP
-						&& currentRowTwo > 0
-						&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
-						&& grid[currentRowTwo - 1][currentColTwo] != CRATE
-						&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
-						&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
-				{
-					currentRowTwo--;
-					playerTwoImg = 5;
-				}
-				else if (event.getKeyCode() == KeyEvent.VK_DOWN
-						&& currentRowTwo < grid.length - 1
-						&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
-						&& grid[currentRowTwo + 1][currentColTwo] != CRATE
-						&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
-						&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
-				{
-					currentRowTwo++;
-					playerTwoImg = 7;
-				}
-				else if (event.getKeyCode() == KeyEvent.VK_SLASH
-						|| event.getKeyCode() == KeyEvent.VK_NUMPAD0)
-				{
-					placeCan(playerTwo, currentRowTwo, currentColTwo);
-				}
+					if (event.getKeyCode() == KeyEvent.VK_LEFT
+							&& currentColTwo > 0
+							&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
+							&& grid[currentRowTwo][currentColTwo - 1] != CRATE
+							&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
+							&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
+					{
+						currentColTwo--;
+						playerTwoImg = 4;
+					}
+					else if (event.getKeyCode() == KeyEvent.VK_RIGHT
+							&& currentColTwo < grid[0].length - 1
+							&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
+							&& grid[currentRowTwo][currentColTwo + 1] != CRATE
+							&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
+							&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
+					{
+						currentColTwo++;
+						playerTwoImg = 6;
+					}
+					else if (event.getKeyCode() == KeyEvent.VK_UP
+							&& currentRowTwo > 0
+							&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
+							&& grid[currentRowTwo - 1][currentColTwo] != CRATE
+							&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
+							&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
+					{
+						currentRowTwo--;
+						playerTwoImg = 5;
+					}
+					else if (event.getKeyCode() == KeyEvent.VK_DOWN
+							&& currentRowTwo < grid.length - 1
+							&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
+							&& grid[currentRowTwo + 1][currentColTwo] != CRATE
+							&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
+							&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
+					{
+						currentRowTwo++;
+						playerTwoImg = 7;
+					}
+					else if (event.getKeyCode() == KeyEvent.VK_SLASH
+							|| event.getKeyCode() == KeyEvent.VK_NUMPAD0)
+					{
+						placeCan(playerTwo, currentRowTwo, currentColTwo);
+					}
 
-				if (grid[currentRowTwo][currentColTwo] == TIRE ||
-						grid[currentRowTwo][currentColTwo] == MENTOS ||
-						grid[currentRowTwo][currentColTwo] == CAN)
-				{
-					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
-					grid[currentRowTwo][currentColTwo] = EMPTY;
+					if (grid[currentRowTwo][currentColTwo] == TIRE ||
+							grid[currentRowTwo][currentColTwo] == MENTOS ||
+							grid[currentRowTwo][currentColTwo] == CAN)
+					{
+						playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
+						grid[currentRowTwo][currentColTwo] = EMPTY;
+					}
 				}
 				// Repaints the screen after the changes
 				repaint();
@@ -894,77 +924,194 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/*
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
 	 * AI STUFF (INCOMPLETE)
+	 * 
+	 * WRITTEN BY HENRY BULLINGHAM
 	 */
 
-	private void updateAItraversalGrid()
+	private void updateAITraversalGrid()
 	{
-		for (int row = 0; row < grid.length; row++)
+		if (noOfPlayers == 1)
 		{
-			for (int col = 0; col < grid[row].length; col++)
+			for (int row = 0; row < grid.length; row++)
 			{
-				aiTraversalGrid[row][col] = grid[row][col];
-				if (aiTraversalGrid[row][col] == REDCAN)
+				for (int col = 0; col < grid[row].length; col++)
 				{
-					markDangerInAIGrid(row, col, playerOne.getRange());
+					aiTraversalGrid[row][col] = grid[row][col];
 				}
-				else if (aiTraversalGrid[row][col] == BLUECAN)
+			}
+
+			for (int row = 0; row < grid.length; row++)
+			{
+				for (int col = 0; col < grid[row].length; col++)
 				{
-					markDangerInAIGrid(row, col, playerTwo.getRange());
+					if (aiTraversalGrid[row][col] == TIRE ||
+							aiTraversalGrid[row][col] == MENTOS ||
+							aiTraversalGrid[row][col] == CAN)
+					{
+						aiTraversalGrid[row][col] = POWERUP;
+					}
+					else if (aiTraversalGrid[row][col] == REDCAN)
+					{
+						markDangerInAIGrid(row, col, playerOne.getRange());
+					}
+					else if (aiTraversalGrid[row][col] == BLUECAN)
+					{
+						markDangerInAIGrid(row, col, playerTwo.getRange());
+					}
 				}
+			}
+
+			// If standing on a bomb, convert it to an explosion, so still in
+			// danger, but not unable to move
+			if (aiTraversalGrid[currentRowTwo][currentColTwo] == BLUECAN)
+			{
+				aiTraversalGrid[currentRowTwo][currentColTwo] = EXPLOSION;
 			}
 		}
 	}
 
 	private void markDangerInAIGrid(int row, int col, int range)
 	{
-		aiTraversalGrid[row][col] = EXPLOSION;
-		for (int direction = 0; direction < 4; direction++)
+		if (noOfPlayers == 1)
 		{
-			boolean wallHit = false;
-			for (int dPos = 1; dPos < range && !wallHit; dPos++)
+			for (int direction = 0; direction < 4; direction++)
 			{
-				int checkRow = row + dPos * DROW[direction];
-				int checkCol = col + dPos * DCOL[direction];
-				if (isInBounds(checkRow, checkCol)
-						&& grid[checkRow][checkCol] != BUILDING
-						&& grid[checkRow][checkCol] != CRATE)
+				boolean wallHit = false;
+				for (int dPos = 1; dPos <= range && !wallHit; dPos++)
 				{
-					grid[checkRow][checkCol] = EXPLOSION;
-				}
-				else
-				{
-					wallHit = true;
+					int checkRow = row + dPos * DROW[direction];
+					int checkCol = col + dPos * DCOL[direction];
+					if (isInBounds(checkRow, checkCol)
+							&& grid[checkRow][checkCol] != BUILDING
+							&& grid[checkRow][checkCol] != CRATE)
+					{
+						aiTraversalGrid[checkRow][checkCol] = EXPLOSION;
+					}
+					else
+					{
+						wallHit = true;
+					}
 				}
 			}
 		}
 	}
 
-	private void generateAiMove()
+	private void generateAIMove()
 	{
-		if (aiTraversalGrid[currentRowTwo][currentColTwo] == EXPLOSION)
+		if (noOfPlayers == 1)
 		{
-			// GTfO
+			if (!isInBounds(currentRowTwo, currentColTwo))
+				return;
+
+			updateAITraversalGrid();
+
+			LinkedList<Node> pathfindingQueue = new LinkedList<Node>();
+			ArrayList<Node> visited = new ArrayList<Node>();
+			pathfindingQueue.add(new Node(currentRowTwo, currentColTwo, null));
+
+			boolean inDanger = aiTraversalGrid[currentRowTwo][currentColTwo] == EXPLOSION;
+
+			Node closestEmpty = null;
+			Node powerUp = null;
+			Node enemy = null;
+			Node closestCrate = null;
+
+			while (!pathfindingQueue.isEmpty())
+			{
+
+				Node next = pathfindingQueue.removeFirst();
+				if (isInBounds(next.row, next.column))
+				{
+					if (!visited.contains(next))
+					{
+						visited.add(next);
+						if (aiTraversalGrid[next.row][next.column] == EMPTY
+								&& closestEmpty == null)
+						{
+							closestEmpty = next;
+						}
+						else if (aiTraversalGrid[next.row][next.column] == POWERUP
+								&& powerUp == null)
+						{
+							powerUp = next;
+						}
+						else if (aiTraversalGrid[next.row][next.column] == CRATE
+								&& closestCrate == null)
+						{
+							closestCrate = next;
+						}
+
+						if (next.row == currentRowOne
+								&& next.column == currentColOne)
+						{
+							enemy = next;
+						}
+						if (aiTraversalGrid[next.row][next.column] == EMPTY
+								||
+								aiTraversalGrid[next.row][next.column] == POWERUP
+								||
+								(aiTraversalGrid[next.row][next.column] == EXPLOSION
+										&&
+										explosionIds[next.row][next.column] == 0
+										&&
+										inDanger && closestEmpty == null))
+						{
+							for (int direction = 0; direction < 4; direction++)
+							{
+								pathfindingQueue.addLast(new Node(next.row
+										+ DROW[direction], next.column
+										+ DCOL[direction], next));
+							}
+						}
+					}
+				}
+			}
+
+			if (inDanger)
+			{
+				if (closestEmpty != null)
+				{
+					currentRowTwo = closestEmpty.row;
+					currentColTwo = closestEmpty.column;
+				}
+				else
+				{
+				}
+			}
+			else if (enemy != null)
+			{
+
+			}
+			else if (powerUp != null)
+			{
+
+			}
+			else if (closestCrate != null)
+			{
+
+			}
+
+			// check for enemy player
+			// go near
+			// drop bomb
+
+			// check for available power ups
+			// get it
+
+			// Check for closest available wall
+			// Move to wall
+			// drop bomb
+
+			// To fill move queue
+			// Insert move command, then direction (use DROW, DCOL [ direction ]
+			// to
+			// move)
+			// If placing bomb, insert PLACE_BOMB command
+
+			// Loop through node's parents to create movement queue. If
+			// applicable,
+			// drop some random bombs
 		}
-		// Check if in danger zone
-		// get out of danger zone
-
-		// check for enemy player
-		// go near
-		// drop bomb
-
-		// check for available power ups
-		// get it
-
-		// Check for closest available wall
-		// Move to wall
-		// drop bomb
-
 	}
-
 }

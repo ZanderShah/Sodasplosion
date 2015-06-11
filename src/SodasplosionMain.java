@@ -35,6 +35,7 @@ public class SodasplosionMain extends JFrame
 	    frame.setUndecorated(true);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 }
