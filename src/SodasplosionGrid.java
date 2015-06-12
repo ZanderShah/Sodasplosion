@@ -943,7 +943,7 @@ public class SodasplosionGrid extends JPanel
 	 * Mostly written by Henry Bullingham
 	 */
 
-	/*private void updateAITraversalGrid()
+	private void updateAITraversalGrid()
 	{
 		if (noOfPlayers == 1)
 		{
@@ -1118,5 +1118,5 @@ public class SodasplosionGrid extends JPanel
 			// applicable,
 			// drop some random bombs
 		}
-	}*/
+	}
 }
