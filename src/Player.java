@@ -6,6 +6,10 @@
  */
 public class Player
 {
+	private final int LIVES = 1;
+	private final int RANGE = 2;
+	private final int TOTAL_CANS = 3;
+	
 	private int[] powerUps;
 	private int currentCans, noOfWins;
 
@@ -16,13 +20,11 @@ public class Player
 	{
 		// 0 is left empty so that the power-ups do not interfere with the
 		// empty tiles
-		// 1 is number of lives
-		// 2 is strength
-		// 3 is total cans
 		powerUps = new int[4];
-		powerUps[1] = 1;
-		powerUps[2] = 1;
-		powerUps[3] = 1;
+		powerUps[LIVES] = 1;
+		powerUps[RANGE] = 1;
+		powerUps[TOTAL_CANS] = 1;
+		
 		currentCans = 1;
 		noOfWins = 0;
 	}
@@ -37,15 +39,15 @@ public class Player
 	{
 		if (powerUps[type] < 5)
 		{
-			if ((type == 2 || type == 3) && powerUps[type] < 5)
+			if ((type == RANGE || type == TOTAL_CANS) && powerUps[type] < 5)
 			{
 				powerUps[type]++;
-				if (type == 3)
+				if (type == TOTAL_CANS)
 				{
 					currentCans++;
 				}
 			}
-			else if (type == 1 && powerUps[type] < 3)
+			else if (type == LIVES && powerUps[type] < 3)
 			{
 				powerUps[type]++;
 			}
@@ -59,7 +61,7 @@ public class Player
 	 */
 	public int getNoOfLives()
 	{
-		return powerUps[1];
+		return powerUps[LIVES];
 	}
 
 	/**
@@ -67,7 +69,7 @@ public class Player
 	 */
 	public void loseLife()
 	{
-		powerUps[1]--;
+		powerUps[LIVES]--;
 	}
 
 	/**
@@ -77,7 +79,7 @@ public class Player
 	 */
 	public int getRange()
 	{
-		return powerUps[2];
+		return powerUps[RANGE];
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class Player
 	 */
 	public int getTotalCans()
 	{
-		return powerUps[3];
+		return powerUps[TOTAL_CANS];
 	}
 
 	/**
@@ -140,9 +142,9 @@ public class Player
 	 */
 	public void resetPower()
 	{
-		powerUps[1] = 1;
-		powerUps[2] = 1;
-		powerUps[3] = 1;
+		powerUps[LIVES] = 1;
+		powerUps[RANGE] = 1;
+		powerUps[TOTAL_CANS] = 1;
 		currentCans = 1;
 	}
 	
