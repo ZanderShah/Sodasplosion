@@ -70,7 +70,7 @@ public class SodasplosionGrid extends JPanel
 	// Player
 	private Player playerOne = new Player();
 	private Player playerTwo = new Player();
-	private int currentRowOne, currentColOne, currentRowTwo, currentColTwo;
+	private int pOneRow, pOneCol, pTwoRow, pTwoCol;
 	private Image playerImages[];
 	private int playerOneImg = 0;
 	private int playerTwoImg = 4;
@@ -189,7 +189,9 @@ public class SodasplosionGrid extends JPanel
 	}
 
 	/**
-	 * Resets the grid to prepare for a new game
+	 * Resets the grid to prepare for a new game.
+	 * 
+	 * @param roundOrGame whether a new game or a new round is being started
 	 */
 	public void resetGame(int roundOrGame)
 	{
@@ -208,21 +210,20 @@ public class SodasplosionGrid extends JPanel
 		if (noOfPlayers == 1)
 		{
 			aiTimer.start();
+			aiGrid = new int[11][13];
 		}
 
-		// Sets up an array to keep track of the grid,
-		// explosions, and AI
+		// Sets up an array to keep track of the grid and explosions
 		grid = new int[11][13];
-		aiGrid = new int[11][13];
 		explosionIds = new long[11][13];
 
 		sodasplosionId = 1;
 
 		// Sets the initial positions for player one and player two
-		currentRowOne = 0;
-		currentColOne = 0;
-		currentRowTwo = 10;
-		currentColTwo = 12;
+		pOneRow = 0;
+		pOneCol = 0;
+		pTwoRow = 10;
+		pTwoCol = 12;
 
 		// Adds the buildings to the grid
 		for (int row = 1; row < grid.length; row++)
@@ -311,7 +312,7 @@ public class SodasplosionGrid extends JPanel
 	/**
 	 * An inner class to deal with the AI movement rate
 	 *
-	 * @author Alexander Shah
+	 * @author Alexander Shah and Amy Zhang
 	 * @version Jun 13, 2015
 	 */
 	private class aiTimer implements ActionListener
@@ -325,6 +326,8 @@ public class SodasplosionGrid extends JPanel
 
 		/**
 		 * Acts upon a fired timer. Generates a new move for the AI
+		 * 
+		 * @param event the Timer event
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
@@ -396,12 +399,14 @@ public class SodasplosionGrid extends JPanel
 	 * @param canRow the given row of the can
 	 * @param canCol the given column of the can
 	 * @param player the player that placed the can
+	 * @param id the id for the given explosion
 	 */
 	public void checkCollision(int canRow, int canCol, Player player, long id)
 	{
 		int range = player.getRange();
 
 		boolean alreadyHitSomething;
+		
 		// Collision code all directions using an outer loop
 		// Checks to see if the explosion hit a crate, another explosion,
 		// or a player, and acts accordingly
@@ -448,7 +453,7 @@ public class SodasplosionGrid extends JPanel
 					explosionIds[checkRow][checkCol] = id;
 				}
 
-				if (currentRowOne == checkRow && currentColOne == checkCol)
+				if (pOneRow == checkRow && pOneCol == checkCol)
 				{
 					playerOne.loseLife();
 					if (playerOne.getNoOfLives() < 1)
@@ -456,13 +461,13 @@ public class SodasplosionGrid extends JPanel
 						playerTwo.winRound();
 						roundOver = true;
 						roundWinner = PLAYER_TWO;
-						currentRowOne = -1;
-						currentColOne = -1;
-						currentRowTwo = -1;
-						currentColTwo = -1;
+						pOneRow = -1;
+						pOneCol = -1;
+						pTwoRow = -1;
+						pTwoCol = -1;
 					}
 				}
-				if (currentRowTwo == checkRow && currentColTwo == checkCol)
+				if (pTwoRow == checkRow && pTwoCol == checkCol)
 				{
 					playerTwo.loseLife();
 					if (playerTwo.getNoOfLives() < 1)
@@ -470,10 +475,10 @@ public class SodasplosionGrid extends JPanel
 						playerOne.winRound();
 						roundOver = true;
 						roundWinner = PLAYER_ONE;
-						currentRowOne = -1;
-						currentColOne = -1;
-						currentRowTwo = -1;
-						currentColTwo = -1;
+						pOneRow = -1;
+						pOneCol = -1;
+						pTwoRow = -1;
+						pTwoCol = -1;
 					}
 				}
 			}
@@ -520,20 +525,20 @@ public class SodasplosionGrid extends JPanel
 	{
 		updateAIGrid();
 
-		if (isInBounds(currentRowTwo, currentColTwo))
+		if (isInBounds(pTwoRow, pTwoCol))
 		{
 			// Checks to see if the AI is in any immediate danger.
 			// Moves the AI away if it is in any danger and places
 			// a can if it is not
-			boolean inDanger = (aiGrid[currentRowTwo][currentColTwo] == EXPLOSION);
+			boolean inDanger = (aiGrid[pTwoRow][pTwoCol] == EXPLOSION);
 
 			if (inDanger)
 			{
-				findSafeZone(currentRowTwo, currentColTwo);
+				findSafeZone(pTwoRow, pTwoCol);
 			}
 			else
 			{
-				placeCan(playerTwo, currentRowTwo, currentColTwo);
+				placeCan(playerTwo, pTwoRow, pTwoCol);
 			}
 		}
 	}
@@ -576,9 +581,9 @@ public class SodasplosionGrid extends JPanel
 
 		// If standing on a bomb, convert it to an explosion, so still in
 		// danger, but not unable to move
-		if (aiGrid[currentRowTwo][currentColTwo] == BLUECAN)
+		if (aiGrid[pTwoRow][pTwoCol] == BLUECAN)
 		{
-			aiGrid[currentRowTwo][currentColTwo] = EXPLOSION;
+			aiGrid[pTwoRow][pTwoCol] = EXPLOSION;
 		}
 	}
 
@@ -650,8 +655,8 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		// Incomplete, need to add a path-finding method instead of warping
-		currentRowTwo = closestRow;
-		currentColTwo = closestCol;
+		pTwoRow = closestRow;
+		pTwoCol = closestCol;
 	}
 
 	/**
@@ -840,115 +845,115 @@ public class SodasplosionGrid extends JPanel
 				// by one level
 
 				// Player One
-				if (event.getKeyCode() == KeyEvent.VK_A && currentColOne > 0
-						&& grid[currentRowOne][currentColOne - 1] != BUILDING
-						&& grid[currentRowOne][currentColOne - 1] != CRATE
-						&& grid[currentRowOne][currentColOne - 1] != REDCAN
-						&& grid[currentRowOne][currentColOne - 1] != BLUECAN)
+				if (event.getKeyCode() == KeyEvent.VK_A && pOneCol > 0
+						&& grid[pOneRow][pOneCol - 1] != BUILDING
+						&& grid[pOneRow][pOneCol - 1] != CRATE
+						&& grid[pOneRow][pOneCol - 1] != REDCAN
+						&& grid[pOneRow][pOneCol - 1] != BLUECAN)
 				{
-					currentColOne--;
+					pOneCol--;
 					playerOneImg = 0;
 				}
 				else if (event.getKeyCode() == KeyEvent.VK_D
-						&& currentColOne < grid[0].length - 1
-						&& grid[currentRowOne][currentColOne + 1] != BUILDING
-						&& grid[currentRowOne][currentColOne + 1] != CRATE
-						&& grid[currentRowOne][currentColOne + 1] != REDCAN
-						&& grid[currentRowOne][currentColOne + 1] != BLUECAN)
+						&& pOneCol < grid[0].length - 1
+						&& grid[pOneRow][pOneCol + 1] != BUILDING
+						&& grid[pOneRow][pOneCol + 1] != CRATE
+						&& grid[pOneRow][pOneCol + 1] != REDCAN
+						&& grid[pOneRow][pOneCol + 1] != BLUECAN)
 				{
-					currentColOne++;
+					pOneCol++;
 					playerOneImg = 2;
 				}
 				else if (event.getKeyCode() == KeyEvent.VK_W
-						&& currentRowOne > 0
-						&& grid[currentRowOne - 1][currentColOne] != BUILDING
-						&& grid[currentRowOne - 1][currentColOne] != CRATE
-						&& grid[currentRowOne - 1][currentColOne] != REDCAN
-						&& grid[currentRowOne - 1][currentColOne] != BLUECAN)
+						&& pOneRow > 0
+						&& grid[pOneRow - 1][pOneCol] != BUILDING
+						&& grid[pOneRow - 1][pOneCol] != CRATE
+						&& grid[pOneRow - 1][pOneCol] != REDCAN
+						&& grid[pOneRow - 1][pOneCol] != BLUECAN)
 				{
-					currentRowOne--;
+					pOneRow--;
 					playerOneImg = 1;
 				}
 				else if (event.getKeyCode() == KeyEvent.VK_S
-						&& currentRowOne < grid.length - 1
-						&& grid[currentRowOne + 1][currentColOne] != BUILDING
-						&& grid[currentRowOne + 1][currentColOne] != CRATE
-						&& grid[currentRowOne + 1][currentColOne] != REDCAN
-						&& grid[currentRowOne + 1][currentColOne] != BLUECAN)
+						&& pOneRow < grid.length - 1
+						&& grid[pOneRow + 1][pOneCol] != BUILDING
+						&& grid[pOneRow + 1][pOneCol] != CRATE
+						&& grid[pOneRow + 1][pOneCol] != REDCAN
+						&& grid[pOneRow + 1][pOneCol] != BLUECAN)
 				{
-					currentRowOne++;
+					pOneRow++;
 					playerOneImg = 3;
 				}
 				else if (event.getKeyCode() == KeyEvent.VK_Q
 						|| event.getKeyCode() == KeyEvent.VK_G)
 				{
-					placeCan(playerOne, currentRowOne, currentColOne);
+					placeCan(playerOne, pOneRow, pOneCol);
 				}
 
-				if (grid[currentRowOne][currentColOne] == TIRE ||
-						grid[currentRowOne][currentColOne] == MENTOS ||
-						grid[currentRowOne][currentColOne] == CAN)
+				if (grid[pOneRow][pOneCol] == TIRE ||
+						grid[pOneRow][pOneCol] == MENTOS ||
+						grid[pOneRow][pOneCol] == CAN)
 				{
-					playerOne.addPower(grid[currentRowOne][currentColOne]);
-					grid[currentRowOne][currentColOne] = EMPTY;
+					playerOne.addPower(grid[pOneRow][pOneCol]);
+					grid[pOneRow][pOneCol] = EMPTY;
 				}
 
 				// Player two
 				if (noOfPlayers == 2)
 				{
 					if (event.getKeyCode() == KeyEvent.VK_LEFT
-							&& currentColTwo > 0
-							&& grid[currentRowTwo][currentColTwo - 1] != BUILDING
-							&& grid[currentRowTwo][currentColTwo - 1] != CRATE
-							&& grid[currentRowTwo][currentColTwo - 1] != REDCAN
-							&& grid[currentRowTwo][currentColTwo - 1] != BLUECAN)
+							&& pTwoCol > 0
+							&& grid[pTwoRow][pTwoCol - 1] != BUILDING
+							&& grid[pTwoRow][pTwoCol - 1] != CRATE
+							&& grid[pTwoRow][pTwoCol - 1] != REDCAN
+							&& grid[pTwoRow][pTwoCol - 1] != BLUECAN)
 					{
-						currentColTwo--;
+						pTwoCol--;
 						playerTwoImg = 4;
 					}
 					else if (event.getKeyCode() == KeyEvent.VK_RIGHT
-							&& currentColTwo < grid[0].length - 1
-							&& grid[currentRowTwo][currentColTwo + 1] != BUILDING
-							&& grid[currentRowTwo][currentColTwo + 1] != CRATE
-							&& grid[currentRowTwo][currentColTwo + 1] != REDCAN
-							&& grid[currentRowTwo][currentColTwo + 1] != BLUECAN)
+							&& pTwoCol < grid[0].length - 1
+							&& grid[pTwoRow][pTwoCol + 1] != BUILDING
+							&& grid[pTwoRow][pTwoCol + 1] != CRATE
+							&& grid[pTwoRow][pTwoCol + 1] != REDCAN
+							&& grid[pTwoRow][pTwoCol + 1] != BLUECAN)
 					{
-						currentColTwo++;
+						pTwoCol++;
 						playerTwoImg = 6;
 					}
 					else if (event.getKeyCode() == KeyEvent.VK_UP
-							&& currentRowTwo > 0
-							&& grid[currentRowTwo - 1][currentColTwo] != BUILDING
-							&& grid[currentRowTwo - 1][currentColTwo] != CRATE
-							&& grid[currentRowTwo - 1][currentColTwo] != REDCAN
-							&& grid[currentRowTwo - 1][currentColTwo] != BLUECAN)
+							&& pTwoRow > 0
+							&& grid[pTwoRow - 1][pTwoCol] != BUILDING
+							&& grid[pTwoRow - 1][pTwoCol] != CRATE
+							&& grid[pTwoRow - 1][pTwoCol] != REDCAN
+							&& grid[pTwoRow - 1][pTwoCol] != BLUECAN)
 					{
-						currentRowTwo--;
+						pTwoRow--;
 						playerTwoImg = 5;
 					}
 					else if (event.getKeyCode() == KeyEvent.VK_DOWN
-							&& currentRowTwo < grid.length - 1
-							&& grid[currentRowTwo + 1][currentColTwo] != BUILDING
-							&& grid[currentRowTwo + 1][currentColTwo] != CRATE
-							&& grid[currentRowTwo + 1][currentColTwo] != REDCAN
-							&& grid[currentRowTwo + 1][currentColTwo] != BLUECAN)
+							&& pTwoRow < grid.length - 1
+							&& grid[pTwoRow + 1][pTwoCol] != BUILDING
+							&& grid[pTwoRow + 1][pTwoCol] != CRATE
+							&& grid[pTwoRow + 1][pTwoCol] != REDCAN
+							&& grid[pTwoRow + 1][pTwoCol] != BLUECAN)
 					{
-						currentRowTwo++;
+						pTwoRow++;
 						playerTwoImg = 7;
 					}
 					else if (event.getKeyCode() == KeyEvent.VK_SLASH
 							|| event.getKeyCode() == KeyEvent.VK_NUMPAD0)
 					{
-						placeCan(playerTwo, currentRowTwo, currentColTwo);
+						placeCan(playerTwo, pTwoRow, pTwoCol);
 					}
 				}
 
-				if (grid[currentRowTwo][currentColTwo] == TIRE ||
-						grid[currentRowTwo][currentColTwo] == MENTOS ||
-						grid[currentRowTwo][currentColTwo] == CAN)
+				if (grid[pTwoRow][pTwoCol] == TIRE ||
+						grid[pTwoRow][pTwoCol] == MENTOS ||
+						grid[pTwoRow][pTwoCol] == CAN)
 				{
-					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
-					grid[currentRowTwo][currentColTwo] = EMPTY;
+					playerTwo.addPower(grid[pTwoRow][pTwoCol]);
+					grid[pTwoRow][pTwoCol] = EMPTY;
 				}
 
 				// Repaints the screen after the changes
@@ -999,13 +1004,13 @@ public class SodasplosionGrid extends JPanel
 					}
 				}
 
-				g.drawImage(playerImages[playerOneImg], currentColOne
+				g.drawImage(playerImages[playerOneImg], pOneCol
 						* IMAGE_WIDTH
-						+ 160, currentRowOne * IMAGE_HEIGHT + 32, this);
+						+ 160, pOneRow * IMAGE_HEIGHT + 32, this);
 
-				g.drawImage(playerImages[playerTwoImg], currentColTwo
+				g.drawImage(playerImages[playerTwoImg], pTwoCol
 						* IMAGE_WIDTH
-						+ 160, currentRowTwo * IMAGE_HEIGHT + 32, this);
+						+ 160, pTwoRow * IMAGE_HEIGHT + 32, this);
 			}
 			else
 			{
