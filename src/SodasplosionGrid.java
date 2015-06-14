@@ -293,9 +293,7 @@ public class SodasplosionGrid extends JPanel
 				grid[row][col] = BLUECAN;
 			}
 
-			explosions.addActionListener(new Sodasplosion(player, player
-					.getRange(),
-					row, col));
+			explosions.addActionListener(new Sodasplosion(player, row, col));
 		}
 	}
 
@@ -343,21 +341,21 @@ public class SodasplosionGrid extends JPanel
 	private class Sodasplosion implements ActionListener
 	{
 		Player player;
-		int canRow, canCol, range, counter;
+		int canRow, canCol, counter;
 		long id;
 
 		/**
 		 * Constructor for Sodasplosion
 		 * 
 		 * @param player the given player
-		 * @param canPos which can is being placed (e.g 1st can)
+		 * @param canRow the row that the can is going to be placed on
+		 * @param canCol the column that the can is going to be placed on
 		 */
-		public Sodasplosion(Player player, int range, int canRow, int canCol)
+		public Sodasplosion(Player player, int canRow, int canCol)
 		{
 			this.player = player;
 			this.canRow = canRow;
 			this.canCol = canCol;
-			this.range = range;
 			this.id = getNextBombId();
 			counter = 0;
 		}
@@ -487,7 +485,7 @@ public class SodasplosionGrid extends JPanel
 	 * 
 	 * @param id the id of the explosion that just went off
 	 */
-	public void clearExplosions(long id)
+	private void clearExplosions(long id)
 	{
 		for (int row = 0; row < grid.length; row++)
 		{
@@ -525,8 +523,8 @@ public class SodasplosionGrid extends JPanel
 		if (isInBounds(currentRowTwo, currentColTwo))
 		{
 			// Checks to see if the AI is in any immediate danger.
-			// Moves the AI away if it is in any danger and looks for
-			// a place to put a can if it is not in danger
+			// Moves the AI away if it is in any danger and places
+			// a can if it is not
 			boolean inDanger = (aiGrid[currentRowTwo][currentColTwo] == EXPLOSION);
 
 			if (inDanger)
@@ -650,7 +648,8 @@ public class SodasplosionGrid extends JPanel
 				}
 			}
 		}
-		
+
+		// Incomplete, need to add a path-finding method instead of warping
 		currentRowTwo = closestRow;
 		currentColTwo = closestCol;
 	}
@@ -943,7 +942,7 @@ public class SodasplosionGrid extends JPanel
 						placeCan(playerTwo, currentRowTwo, currentColTwo);
 					}
 				}
-				
+
 				if (grid[currentRowTwo][currentColTwo] == TIRE ||
 						grid[currentRowTwo][currentColTwo] == MENTOS ||
 						grid[currentRowTwo][currentColTwo] == CAN)
@@ -951,13 +950,12 @@ public class SodasplosionGrid extends JPanel
 					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
 					grid[currentRowTwo][currentColTwo] = EMPTY;
 				}
-				
+
 				// Repaints the screen after the changes
 				repaint();
 			}
 		}
 	}
-	
 
 	/**
 	 * Repaint the drawing panel
