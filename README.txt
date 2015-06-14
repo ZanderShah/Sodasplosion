@@ -1,5 +1,5 @@
-			Sodasplosion
-			============
+Sodasplosion
+============
 
 Authors: Alexander Shah & Amy Zhang
 
