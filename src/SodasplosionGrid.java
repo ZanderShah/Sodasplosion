@@ -88,7 +88,7 @@ public class SodasplosionGrid extends JPanel
 	private int totalWins = 1;
 	private int mapType = 1;
 
-	// In-game sidebar
+	// In-game side-bar
 	private Rectangle IN_GAME_BACK = new Rectangle(15, 632, 100, 30);
 	private Rectangle IN_GAME_INSTRUCTIONS = new Rectangle(15, 678, 100, 30);
 	private Rectangle IN_GAME_EXIT = new Rectangle(15, 724, 100, 30);
@@ -113,11 +113,8 @@ public class SodasplosionGrid extends JPanel
 	private Image mainMenu, startMenu, instructions1, instructions2, story;
 
 	// AI
-	private int[][] aiTraversalGrid;
-	private static final int MOVE = 0;
-	private static final int PLACE_BOMB = 1;
+	private int[][] aiGrid;
 	private final int POWERUP = 9;
-	private LinkedList<Integer> aiMoveQueue;
 	private Timer aiTimer;
 
 	/**
@@ -174,6 +171,8 @@ public class SodasplosionGrid extends JPanel
 		explosions = new Timer(100, null);
 		explosions.start();
 
+		aiTimer = new Timer(500, new aiTimer());
+
 		// Set the image height and width based on the path image size
 		// Also sizes this panel based on the image and grid size
 		Dimension size = new Dimension(1024, 768);
@@ -208,14 +207,13 @@ public class SodasplosionGrid extends JPanel
 
 		if (noOfPlayers == 1)
 		{
-			aiTimer = new Timer(100, new aiTimer());
 			aiTimer.start();
 		}
 
 		// Sets up an array to keep track of the grid,
 		// explosions, and AI
 		grid = new int[11][13];
-		aiTraversalGrid = new int[11][13];
+		aiGrid = new int[11][13];
 		explosionIds = new long[11][13];
 
 		sodasplosionId = 1;
@@ -328,8 +326,7 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		/**
-		 * Acts upon a fired timer. Generates a new move for the AI and acts
-		 * upon a move in the existing queue
+		 * Acts upon a fired timer. Generates a new move for the AI
 		 */
 		public void actionPerformed(ActionEvent event)
 		{
@@ -366,8 +363,8 @@ public class SodasplosionGrid extends JPanel
 		}
 
 		/**
-		 * Acts upon a fired timer Creates a sodasplosion and checks for
-		 * collisions Uses multiple timer fires to animate the explosion
+		 * Acts upon a fired timer. Creates a sodasplosion and checks for
+		 * collisions. Uses multiple timer fires to animate the explosion
 		 * 
 		 * @param event the Timer event
 		 */
@@ -516,6 +513,146 @@ public class SodasplosionGrid extends JPanel
 	{
 		return (row >= 0 && row < grid.length && col >= 0
 		&& col < grid[row].length);
+	}
+
+	/**
+	 * Generates the best possible move for the AI
+	 */
+	private void generateAIMove()
+	{
+		updateAIGrid();
+
+		if (isInBounds(currentRowTwo, currentColTwo))
+		{
+			// Checks to see if the AI is in any immediate danger.
+			// Moves the AI away if it is in any danger and looks for
+			// a place to put a can if it is not in danger
+			boolean inDanger = (aiGrid[currentRowTwo][currentColTwo] == EXPLOSION);
+
+			if (inDanger)
+			{
+				findSafeZone(currentRowTwo, currentColTwo);
+			}
+			else
+			{
+				placeCan(playerTwo, currentRowTwo, currentColTwo);
+			}
+		}
+	}
+
+	/**
+	 * Fills the AI grid with current information
+	 */
+	private void updateAIGrid()
+	{
+		for (int row = 0; row < grid.length; row++)
+		{
+			for (int col = 0; col < grid[row].length; col++)
+			{
+				aiGrid[row][col] = grid[row][col];
+			}
+		}
+
+		// Marks the power-ups and explosions on the grid
+		// Marks the dangerous spots if an explosion has been placed
+		for (int row = 0; row < grid.length; row++)
+		{
+			for (int col = 0; col < grid[row].length; col++)
+			{
+				if (aiGrid[row][col] == TIRE ||
+						aiGrid[row][col] == MENTOS ||
+						aiGrid[row][col] == CAN)
+				{
+					aiGrid[row][col] = POWERUP;
+				}
+				else if (aiGrid[row][col] == REDCAN)
+				{
+					markDanger(row, col, playerOne.getRange());
+				}
+				else if (aiGrid[row][col] == BLUECAN)
+				{
+					markDanger(row, col, playerTwo.getRange());
+				}
+			}
+		}
+
+		// If standing on a bomb, convert it to an explosion, so still in
+		// danger, but not unable to move
+		if (aiGrid[currentRowTwo][currentColTwo] == BLUECAN)
+		{
+			aiGrid[currentRowTwo][currentColTwo] = EXPLOSION;
+		}
+	}
+
+	/**
+	 * Marks dangers in all directions using an outer loop Checks to see what
+	 * tiles the explosion will hit and marks them as explosions prematurely
+	 * 
+	 * @param row the given row to start checking at
+	 * @param col the given column to start checking at
+	 * @param range the range of the given explosion
+	 */
+	private void markDanger(int row, int col, int range)
+	{
+		for (int direction = 0; direction < DROW.length; direction++)
+		{
+			boolean wallHit = false;
+
+			for (int dPos = 0; dPos <= range && !wallHit; dPos++)
+			{
+				int checkRow = row + dPos * DROW[direction];
+				int checkCol = col + dPos * DCOL[direction];
+
+				if (isInBounds(checkRow, checkCol)
+						&& grid[checkRow][checkCol] != BUILDING
+						&& grid[checkRow][checkCol] != CRATE)
+				{
+					aiGrid[checkRow][checkCol] = EXPLOSION;
+				}
+				else
+				{
+					wallHit = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Finds the closest safe zone relative to the player
+	 * 
+	 * @param row the row that the player is checking from
+	 * @param col the column that the player is checking from
+	 */
+	private void findSafeZone(int row, int col)
+	{
+		// Starts the distance at a high number so that the first safe zone
+		// found
+		// will be the new closest
+		int closestRow = 100;
+		int closestCol = 100;
+
+		// Approximates distance using "Manhattan Distance"
+		// and keeps track of the row and column of the closest
+		// safe zone
+		for (int checkRow = 0; checkRow < aiGrid.length; checkRow++)
+		{
+			for (int checkCol = 0; checkCol < aiGrid[0].length; checkCol++)
+			{
+				if (aiGrid[checkRow][checkCol] == EMPTY
+						|| aiGrid[checkRow][checkCol] == POWERUP)
+				{
+					if ((Math.abs(row - checkRow) + Math.abs(col - checkCol))
+					< (Math.abs(row - closestRow) + Math.abs(col - closestCol)))
+					{
+						closestRow = checkRow;
+						closestCol = checkCol;
+					}
+				}
+			}
+		}
+		
+		currentRowTwo = closestRow;
+		currentColTwo = closestCol;
 	}
 
 	/**
@@ -805,20 +942,22 @@ public class SodasplosionGrid extends JPanel
 					{
 						placeCan(playerTwo, currentRowTwo, currentColTwo);
 					}
-
-					if (grid[currentRowTwo][currentColTwo] == TIRE ||
-							grid[currentRowTwo][currentColTwo] == MENTOS ||
-							grid[currentRowTwo][currentColTwo] == CAN)
-					{
-						playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
-						grid[currentRowTwo][currentColTwo] = EMPTY;
-					}
 				}
+				
+				if (grid[currentRowTwo][currentColTwo] == TIRE ||
+						grid[currentRowTwo][currentColTwo] == MENTOS ||
+						grid[currentRowTwo][currentColTwo] == CAN)
+				{
+					playerTwo.addPower(grid[currentRowTwo][currentColTwo]);
+					grid[currentRowTwo][currentColTwo] = EMPTY;
+				}
+				
 				// Repaints the screen after the changes
 				repaint();
 			}
 		}
 	}
+	
 
 	/**
 	 * Repaint the drawing panel
@@ -872,6 +1011,8 @@ public class SodasplosionGrid extends JPanel
 			}
 			else
 			{
+				aiTimer.stop();
+
 				g.setFont(largeFont);
 
 				if (playerOne.getNoOfWins() == totalWins
@@ -964,198 +1105,6 @@ public class SodasplosionGrid extends JPanel
 		else if (menu == INSTRUCTIONS_2)
 		{
 			g.drawImage(instructions2, 0, 0, this);
-		}
-	}
-
-	/*
-	 * AI STUFF BELOW (Incomplete)
-	 * 
-	 * Mostly written by Henry Bullingham
-	 */
-
-	private void generateAIMove()
-	{
-		if (isInBounds(currentRowTwo, currentColTwo))
-		{
-			updateAIGrid();
-
-			LinkedList<Node> pathfindingQueue = new LinkedList<Node>();
-			ArrayList<Node> visited = new ArrayList<Node>();
-			pathfindingQueue.add(new Node(currentRowTwo, currentColTwo, null));
-
-			// Checks to see if the AI is in any immediate danger
-			boolean inDanger = (aiTraversalGrid[currentRowTwo][currentColTwo] == EXPLOSION);
-
-			Node closestEmpty = null;
-			Node powerUp = null;
-			Node enemy = null;
-			Node closestCrate = null;
-
-			while (!pathfindingQueue.isEmpty())
-			{
-				Node next = pathfindingQueue.removeFirst();
-				if (isInBounds(next.row, next.col))
-				{
-					if (!visited.contains(next))
-					{
-						visited.add(next);
-						if (aiTraversalGrid[next.row][next.col] == EMPTY
-								&& closestEmpty == null)
-						{
-							closestEmpty = next;
-						}
-						else if (aiTraversalGrid[next.row][next.col] == POWERUP
-								&& powerUp == null)
-						{
-							powerUp = next;
-						}
-						else if (aiTraversalGrid[next.row][next.col] == CRATE
-								&& closestCrate == null)
-						{
-							closestCrate = next;
-						}
-
-						if (next.row == currentRowOne
-								&& next.col == currentColOne)
-						{
-							enemy = next;
-						}
-						if (aiTraversalGrid[next.row][next.col] == EMPTY
-								|| aiTraversalGrid[next.row][next.col] == POWERUP
-								|| (aiTraversalGrid[next.row][next.col] == EXPLOSION
-										&& explosionIds[next.row][next.col] == 0
-										&& inDanger && closestEmpty == null))
-						{
-							for (int direction = 0; direction < 4; direction++)
-							{
-								pathfindingQueue.addLast(new Node(next.row
-										+ DROW[direction], next.col
-										+ DCOL[direction], next));
-							}
-						}
-					}
-				}
-			}
-
-			if (inDanger)
-			{
-				if (closestEmpty != null)
-				{
-					currentRowTwo = closestEmpty.row;
-					currentColTwo = closestEmpty.col;
-					visited.remove(closestEmpty);
-				}
-				else
-				{
-					playerTwo.placeCan();
-				}
-			}
-			else if (powerUp != null)
-			{
-
-			}
-			else if (closestCrate != null)
-			{
-
-			}
-			else if (enemy != null)
-			{
-				currentRowTwo = enemy.row;
-				currentColTwo = enemy.col;
-			}
-
-			// check for enemy player
-			// go near
-			// drop bomb
-
-			// check for available power ups
-			// get it
-
-			// Check for closest available wall
-			// Move to wall
-			// drop bomb
-
-			// To fill move queue
-			// Insert move command, then direction (use DROW, DCOL [ direction ]
-			// to
-			// move)
-			// If placing bomb, insert PLACE_BOMB command
-
-			// Loop through node's parents to create movement queue. If
-			// applicable,
-			// drop some random bombs
-		}
-	}
-
-	/**
-	 * Fills the AI grid with current information
-	 */
-	private void updateAIGrid()
-	{
-		for (int row = 0; row < grid.length; row++)
-		{
-			for (int col = 0; col < grid[row].length; col++)
-			{
-				aiTraversalGrid[row][col] = grid[row][col];
-			}
-		}
-
-		// Marks the power-ups and explosions on the grid
-		// Marks the dangerous spots if an explosion has been placed
-		for (int row = 0; row < grid.length; row++)
-		{
-			for (int col = 0; col < grid[row].length; col++)
-			{
-				if (aiTraversalGrid[row][col] == TIRE ||
-						aiTraversalGrid[row][col] == MENTOS ||
-						aiTraversalGrid[row][col] == CAN)
-				{
-					aiTraversalGrid[row][col] = POWERUP;
-				}
-				else if (aiTraversalGrid[row][col] == REDCAN)
-				{
-					markDanger(row, col, playerOne.getRange());
-				}
-				else if (aiTraversalGrid[row][col] == BLUECAN)
-				{
-					markDanger(row, col, playerTwo.getRange());
-				}
-			}
-		}
-
-		// If standing on a bomb, convert it to an explosion, so still in
-		// danger, but not unable to move
-		if (aiTraversalGrid[currentRowTwo][currentColTwo] == BLUECAN)
-		{
-			aiTraversalGrid[currentRowTwo][currentColTwo] = EXPLOSION;
-		}
-	}
-
-	private void markDanger(int row, int col, int range)
-	{
-		// Marks dangers in all directions using an outer loop
-		// Checks to see what tiles the explosion will hit and marks
-		// them as explosions prematurely
-		for (int direction = 0; direction < DROW.length; direction++)
-		{
-			boolean wallHit = false;
-
-			for (int dPos = 0; dPos <= range && !wallHit; dPos++)
-			{
-				int checkRow = row + dPos * DROW[direction];
-				int checkCol = col + dPos * DCOL[direction];
-
-				if (isInBounds(checkRow, checkCol)
-						&& grid[checkRow][checkCol] != BUILDING
-						&& grid[checkRow][checkCol] != CRATE)
-				{
-					aiTraversalGrid[checkRow][checkCol] = EXPLOSION;
-				}
-				else
-				{
-					wallHit = true;
-				}
-			}
 		}
 	}
 }
