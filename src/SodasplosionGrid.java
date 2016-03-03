@@ -303,7 +303,7 @@ public class SodasplosionGrid extends JPanel
 	 * 
 	 * @return the id for the next explosion group
 	 */
-	public long getNextBombId()
+	public long getNextSodasplosionId()
 	{
 		sodasplosionId++;
 		return sodasplosionId - 1;
@@ -359,7 +359,7 @@ public class SodasplosionGrid extends JPanel
 			this.player = player;
 			this.canRow = canRow;
 			this.canCol = canCol;
-			this.id = getNextBombId();
+			this.id = getNextSodasplosionId();
 			counter = 0;
 		}
 
