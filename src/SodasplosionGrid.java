@@ -298,6 +298,11 @@ public class SodasplosionGrid extends JPanel
 		}
 	}
 
+	
+	
+	
+	
+	
 	/**
 	 * Gives the id for the next explosion group
 	 * 
