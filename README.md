@@ -1,4 +1,4 @@
 Sodasplosion
 ============
 
-Bomberman clone for ICS3U6.
+Bomberman clone for the final project in ICS3U6.
